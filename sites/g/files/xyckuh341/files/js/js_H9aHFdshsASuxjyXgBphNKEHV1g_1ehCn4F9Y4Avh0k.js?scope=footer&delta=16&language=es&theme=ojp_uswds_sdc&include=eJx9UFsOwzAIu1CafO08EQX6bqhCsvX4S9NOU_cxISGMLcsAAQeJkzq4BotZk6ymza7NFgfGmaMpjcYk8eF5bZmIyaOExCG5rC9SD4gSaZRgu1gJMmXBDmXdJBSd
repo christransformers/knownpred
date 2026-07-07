@@ -1,0 +1,119 @@
+/* @license GPL-2.0-or-later https://www.drupal.org/licensing/faq */
+(function($,drupalSettings,window){'use strict';const searchElements=document.getElementsByClassName('usa-search');if(searchElements&&searchElements.length>1)searchElements[0].remove();function injectOverrideStyles(){if(document.getElementById('ojp-search-override-styles'))return;const styleTag=document.createElement('style');styleTag.id='ojp-search-override-styles';styleTag.textContent=`
+      /* Force our styles to load after Google's */
+      .usa-search.usa-search--small table,
+      .gsc-search-box table {
+        background: transparent !important;
+        border: 0 none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: table !important;
+      }
+
+      .usa-search.usa-search--small tr,
+      .gsc-search-box tr {
+        background: transparent !important;
+        border: 0 none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        gap: 0 !important;
+      }
+
+      .usa-search.usa-search--small td,
+      .gsc-search-box td {
+        background: transparent !important;
+        border: 0 none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        flex-shrink: 0 !important;
+      }
+
+      /* Let theme CSS handle input styling - only ensure visibility and white background */
+      .usa-search.usa-search--small input,
+      .gsc-search-box input,
+      .gsc-input input {
+        display: block !important;
+        background: white !important;
+        margin: 0 !important;
+      }
+
+      .gsc-input {
+        background: none !important;
+        padding: 0 !important;
+        display: table-cell !important;
+        width: auto !important;
+      }
+
+      .gsc-input-box {
+        border: 0 !important;
+        padding: 0 !important;
+        display: table-cell !important;
+        margin: 0 !important;
+        width: auto !important;
+      }
+
+      /* Remove spacing between input and button */
+      form.gsc-search-box {
+        margin-top: 0 !important;
+        margin-right: 0 !important;
+        margin-bottom: 4px !important;
+        margin-left: 0 !important;
+        width: 100% !important;
+      }
+
+      /* Mobile styles for search box */
+      @media screen and (max-width: 768px) {
+        form.gsc-search-box {
+          max-width: 652px !important;
+          font-size: 14px !important;
+          margin-top: 0 !important;
+          margin-right: 24px !important;
+          margin-bottom: 4px !important;
+          margin-left: 24px;
+          width: 100% !important;
+        }
+
+        .usa-search.usa-search--small,
+        .gsc-search-box {
+          margin-left: 24px;
+        }
+      }
+
+      .gsc-search-box table {
+        border-spacing: 0 !important;
+        border-collapse: collapse !important;
+      }
+
+      /* Remove background from Google's wrapper divs */
+      div[id^="gsc-iw-"] {
+        background: none !important;
+        max-width: 15rem !important;
+      }
+
+      /* Ensure button is visible in table layout */
+      .gsc-search-button,
+      .gsc-search-button-v2 {
+        display: table-cell !important;
+      }
+
+      .gsc-search-button button,
+      .gsc-search-button-v2 button {
+        display: block !important;
+      }
+
+      /* Hide Google's SVG icons in button */
+      .gsc-search-button svg,
+      .gsc-search-button button svg {
+        display: none !important;
+      }
+
+      /* Hide the clear search button */
+      .gsc-clear-button,
+      .gsst_a {
+        display: none !important;
+      }
+    `;document.head.appendChild(styleTag);}function forceCorrectStyles(){const tables=document.querySelectorAll('.usa-search table, .gsc-search-box table');tables.forEach(function(table){table.style.cssText='background: transparent !important; border: 0 !important; margin: 0 !important; padding: 0 !important; display: table !important;';});const trs=document.querySelectorAll('.usa-search tr, .gsc-search-box tr');trs.forEach(function(tr){tr.style.cssText='background: transparent !important; border: 0 !important; margin: 0 !important; padding: 0 !important; display: flex !important; flex-wrap: nowrap !important; gap: 0 !important;';});const tds=document.querySelectorAll('.usa-search td, .gsc-search-box td, .gsc-input-box td');tds.forEach(function(td){td.style.cssText='background: transparent !important; border: 0 !important; margin: 0 !important; padding: 0 !important; flex-shrink: 0 !important;';});const inputs=document.querySelectorAll('.gsc-input input, .gsc-search-box input');inputs.forEach(function(input){input.removeAttribute('style');});const inputBoxes=document.querySelectorAll('.gsc-input-box');inputBoxes.forEach(function(box){box.removeAttribute('style');});const gscInputs=document.querySelectorAll('.gsc-input');gscInputs.forEach(function(input){input.removeAttribute('style');});const buttonContainers=document.querySelectorAll('.gsc-search-button, .gsc-search-button-v2');buttonContainers.forEach(function(container){container.style.cssText='display: table-cell !important;';});const buttons=document.querySelectorAll('.gsc-search-button button, .gsc-search-button-v2 button');buttons.forEach(function(button){button.style.cssText='display: block !important;';});const buttonSvgs=document.querySelectorAll('.gsc-search-button svg, .gsc-search-button button svg');buttonSvgs.forEach(function(svg){svg.style.display='none';});}window.__gcse=window.__gcse||{};window.__gcse.parsetags='onload';window.__gcse.initializationCallback=function(){if(!window.google.search.cse.element.getElement('ojp-search').getInputQuery())$('[data-ojpSearchResultsHeading]').after('<h3 data-ojpSearchResultsNoQuery>'+drupalSettings.ojp_search.search_no_query_text+'</h3>');$('input.gsc-input').attr('placeholder','Search');injectOverrideStyles();forceCorrectStyles();};window.__gcse.searchCallbacks={web:{ready:function(gname,query,promos,results,div){$('[data-ojpSearchResultsNoQuery]').remove();const searchBox=document.querySelector('.gcse-searchbox, .gcse-searchbox-only');if(searchBox&&!searchBox.closest('.usa-search')){const wrapper=document.createElement('div');wrapper.className='usa-search usa-search--small';searchBox.parentNode.insertBefore(wrapper,searchBox);wrapper.appendChild(searchBox);}injectOverrideStyles();forceCorrectStyles();}}};setTimeout(function(){injectOverrideStyles();forceCorrectStyles();},100);setTimeout(forceCorrectStyles,500);setTimeout(forceCorrectStyles,1000);let isApplyingStyles=false;const observer=new MutationObserver(function(mutations){if(isApplyingStyles)return;let shouldForceStyles=false;let mutationDetails=[];mutations.forEach(function(mutation){if(mutation.type==='childList')mutation.addedNodes.forEach(function(node){if(node.nodeType===1){const className=typeof node.className==='string'?node.className:'';if(className.includes('gsc-')||className.includes('gs')){shouldForceStyles=true;mutationDetails.push({type:'childList',nodeName:node.nodeName,className,innerHTML:node.innerHTML.substring(0,100)});}}});else{if(mutation.type==='attributes'&&mutation.attributeName==='style'){const target=mutation.target;const targetClassName=typeof target.className==='string'?target.className:'';if(targetClassName.includes('gsc-')||targetClassName.includes('gs')){const style=target.getAttribute('style');if(style&&(style.includes('rgb(255, 255, 255)')||style.includes('background:'))){shouldForceStyles=true;mutationDetails.push({type:'styleChange',nodeName:target.nodeName,className:targetClassName,oldStyle:mutation.oldValue,newStyle:style});}}}}});if(shouldForceStyles){isApplyingStyles=true;forceCorrectStyles();setTimeout(function(){isApplyingStyles=false;},50);}});if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['style']});});else observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['style']});})(jQuery,drupalSettings,window);;
+(function($,Drupal,drupalSettings,window){'use strict';var micrositeSearchSettings=drupalSettings.ojp_search_microsite||{};var micrositePath=micrositeSearchSettings.path||'';var micrositeTitle=micrositeSearchSettings.title||'';var currentSite=micrositeSearchSettings.current_site||'';var callbacks=$.extend({},window.__gcse.searchCallbacks.web);window.__gcse.searchCallbacks.web.starting=function(gname,query){$('[data-ojpMicrositeNotice]').remove();if(callbacks.hasOwnProperty('starting'))query=callbacks.starting(gname,query);return micrositePath?'site:'+currentSite+micrositePath+'/ '+query:query;};window.__gcse.searchCallbacks.web.ready=function(gname,query,promos,results,div){if(callbacks.hasOwnProperty('ready'))callbacks.ready(gname,query,promos,results,div);if(micrositePath&&micrositeTitle){var reloadLink=window.document.createElement('a');reloadLink.setAttribute('href',window.location.href);var queryString=reloadLink.search;var pairs=(queryString[0]==='?'?queryString.substr(1):queryString).split('&');var newPairs=[];for(var i=0;i<pairs.length;i++){var pair=pairs[i].split('=');if(pair[0]!=='microsite_path'&&pair[0]!=='microsite_title')newPairs.push(pairs[i]);}if(newPairs)reloadLink.search='?'+newPairs.join('&');var $reloadLink=$(reloadLink).text(Drupal.t('here'));let escapeHtml=function(unsafe){return unsafe.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");};let escapedMicrositeTitle=escapeHtml(micrositeTitle);let escapedMicrositePath=escapeHtml(micrositePath);var $micrositeNotice=$('<p data-ojpMicrositeNotice>'+Drupal.t('Searching microsite ')+'<em>'+escapedMicrositeTitle+'</em>. '+Drupal.t('Click')+' </p>').append($reloadLink).append(Drupal.t(' to search the whole site.'));$('[data-ojpSearchResultsHeading]').after($micrositeNotice);}};})(jQuery,Drupal,window.drupalSettings,window);;
+(function(Drupal,once,$){function checkGoogleCSELoaded(callback,timeout,startTime){const currentTime=new Date().getTime();if(window.google&&window.google.search&&window.google.search.cse&&window.google.search.cse.element)callback();else{if(currentTime-startTime<timeout)setTimeout(function(){checkGoogleCSELoaded(callback,timeout,startTime);},250);}}function checkElementsLoaded(callback,timeout,startTime){const currentTime=new Date().getTime();const searchButtons=document.querySelectorAll(".gsc-search-button.gsc-search-button-v2");const searchBoxes=document.querySelectorAll(".gsc-input");if(searchButtons.length>0&&searchBoxes.length>0)callback(searchButtons,searchBoxes);else{if(currentTime-startTime<timeout)setTimeout(function(){checkElementsLoaded(callback,timeout,startTime);},250);}}Drupal.behaviors.ojpSearchAccessibility={attach:function(){const timeout=5000;const startTime=new Date().getTime();checkGoogleCSELoaded(function(){checkElementsLoaded(function(searchButtons,searchBoxes){once("ojpSearchAccessibility",searchButtons).forEach(function(button){button.setAttribute("aria-label","Search button");button.setAttribute("name","search button");});once("ojpSearchAccessibility",searchBoxes).forEach(function(input){input.setAttribute("aria-label","Search");input.setAttribute("name","search");});},timeout,startTime);},timeout,startTime);}};})(Drupal,once,jQuery);;

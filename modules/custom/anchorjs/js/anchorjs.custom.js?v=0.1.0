@@ -1,0 +1,75 @@
+/**
+ * @file
+ * Custom AnchorJS JS.
+ *
+ */
+/* jshint esversion: 6 */
+
+(function ($, Drupal, drupalSettings, anchors, window) {
+  'use strict';
+  // Per https://www.bryanbraun.com/anchorjs/#dont-run-it-too-late, adding
+  // anchors outside behaviors so that they are added early.
+
+  // Setting anchor default options.
+  anchors.options.visible = 'always';
+  anchors.options.ariaLabel = Drupal.t('Copy link to clipboard');
+  anchors.options.titleText = Drupal.t('Copy link to clipboard');
+
+  /**
+   * Adds anchors and configures custom attributes.
+   */
+  function handleAnchors() {
+    // Custom selector variable checks for `settings` and falls back
+    // on drupalSettings so function can run in and out of Drupal behaviors.
+    const custom_selector = typeof (settings) !== 'undefined' ? settings.anchorjs.selector : drupalSettings.anchorjs.selector;
+    // Add anchors
+    if (custom_selector) {
+      // If selector was set with custom value, apply anchors to that selector.
+      anchors.add(custom_selector);
+    }
+    else {
+      // Use default selector ('h2, h3, h4, h5, h6').
+      anchors.add();
+    }
+    // Set custom title and aria label for each anchor from the element's text.
+    // Use setTimeout to ensure anchor links are fully rendered in the DOM.
+    setTimeout(() => {
+      anchors.elements.forEach(element => {
+        const element_text = element.innerText.trim();
+        if (element_text.length) {
+          const element_anchor = element.querySelector('.anchorjs-link');
+          if (element_anchor) {
+            const descriptive_text = Drupal.t('Copy link to section: ') + element_text;
+            element_anchor.setAttribute('aria-label', descriptive_text);
+            element_anchor.setAttribute('title', descriptive_text);
+          }
+        }
+      });
+    }, 0);
+  }
+  handleAnchors();
+
+  Drupal.behaviors.anchorJS = {
+    attach: function (context, settings) {
+      // Run handleAnchors() again to account for any new DOM elements in context
+      // that are missing anchor links every time the behavior runs.
+      handleAnchors();
+
+      $(once('anchorJS', 'a.anchorjs-link', context)).each(() => {
+        $(this).click(function () {
+          // Copy anchorjs location to clipboard. Clipboard JS is loaded async,
+          // so need to check that it exists the time of the click event.
+          const ClipboardJS = window.ClipboardJS || null;
+          if (ClipboardJS && ClipboardJS.isSupported()) {
+            new ClipboardJS('a.anchorjs-link', {
+              text: function (trigger) {
+                return trigger.href;
+              }
+            });
+          }
+        });
+      });
+    }
+  };
+
+})(jQuery, Drupal, drupalSettings, anchors, window);

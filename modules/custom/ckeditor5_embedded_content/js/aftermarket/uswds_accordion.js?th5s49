@@ -1,0 +1,72 @@
+(function ($, Drupal) {
+  Drupal.behaviors.uswds_ckeditor_integration_accordion = {
+    attach: function (context, settings) {
+      // Apply modifications only once to each accordion button
+      $('div.usa-accordion__button:not(#layout-builder *)').each(function () {
+        if (!$(this).hasClass('js-accordion-modified')) {
+          let outer = this.outerHTML;
+          let regexOpen = new RegExp('<' + this.tagName, 'i');
+          let newTag = outer.replace(regexOpen, '<button');
+          let regexClose = new RegExp('</' + this.tagName, 'i');
+          newTag = newTag.replace(regexClose, '</button');
+          $(this).replaceWith(newTag).addClass('js-accordion-modified');
+        }
+      });
+
+      let $containerCounter = 0;
+      $('main .usa-accordion:not(#layout-builder *)').each(function () {
+        if (!$(this).hasClass('js-accordion-container-modified')) {
+          let $itemCounter = 0;
+          $('.usa-accordion__button', this).each(function () {
+            $(this).attr('aria-controls', $containerCounter + '-' + $itemCounter);
+            $itemCounter++;
+          });
+
+          $itemCounter = 0;
+          $('.usa-accordion__content', this).each(function () {
+            $(this).attr('id', $containerCounter + '-' + $itemCounter);
+            $itemCounter++;
+          });
+
+          $containerCounter++;
+          $(this).addClass('js-accordion-container-modified');
+        }
+      });
+
+      // Wrap each button and content pair in its own div, ignoring those within #layout-builder
+      $('main .usa-accordion:not(#layout-builder *)').each(function () {
+        $(this).find('.usa-accordion__heading').each(function () {
+          if (!$(this).hasClass('js-accordion-heading-modified')) {
+            let $button = $(this).find('.usa-accordion__button');
+            let $content = $(this).next('.usa-accordion__content');
+            $button.add($content).wrapAll('<div class="usa-accordion" />');
+            $(this).addClass('js-accordion-heading-modified');
+          }
+        });
+      });
+
+      // Adjust for URL hash, focusing outside #layout-builder
+      let hash = window.location.hash.replace('#', '');
+      if (hash) {
+        let $matchingButton = $('button[aria-controls="' + hash + '"]:not(#layout-builder *)', context);
+        if ($matchingButton.length && !$matchingButton.hasClass('js-accordion-hash-modified')) {
+          $matchingButton.attr('aria-expanded', 'true');
+          $('#' + hash).removeAttr('hidden');
+          $matchingButton.addClass('js-accordion-hash-modified');
+
+          $matchingButton.parents('.usa-accordion__content:not(#layout-builder *)').each(function() {
+            if (!$(this).hasClass('js-accordion-parent-modified')) {
+              let parentId = $(this).attr('id');
+              let $parentButton = $('button[aria-controls="' + parentId + '"]:not(#layout-builder *)', context);
+              if ($parentButton.length) {
+                $parentButton.attr('aria-expanded', 'true');
+                $('#' + parentId).removeAttr('hidden');
+                $(this).addClass('js-accordion-parent-modified');
+              }
+            }
+          });
+        }
+      }
+    }
+  };
+})(jQuery, Drupal);
