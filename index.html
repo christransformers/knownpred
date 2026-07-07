@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CaseOutcomes — Australia's Criminal Case Outcomes Database</title>
+<meta name="description" content="Search 1.5M+ Australian criminal case outcomes across 1,061 databases spanning 8 jurisdictions. Free access to Australia's legal history.">
+<meta property="og:title" content="CaseOutcomes — Australia's Criminal Case Outcomes Database">
+<meta property="og:description" content="Search 1.5M+ Australian criminal case outcomes. Free access to Australia's legal history across 8 jurisdictions.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.caseoutcomes.com.au">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ============================
+     CSS CUSTOM PROPERTIES
+     ============================ */
+  :root {
+    --color-bg: #f0f2f6;
+    --color-bg-alt: #ffffff;
+    --color-bg-card: #ffffff;
+    --color-bg-glass: rgba(255, 255, 255, 0.75);
+    --color-gold: #c9a84c;
+    --color-gold-light: #dbb85a;
+    --color-gold-dark: #a8892e;
+    --color-navy: #1e3a5f;
+    --color-navy-light: #2c5282;
+    --color-navy-dark: #142841;
+    --color-text: #1a202c;
+    --color-text-secondary: #4a5568;
+    --color-text-muted: #a0aec0;
+    --color-border: rgba(30, 58, 95, 0.1);
+    --color-border-light: rgba(30, 58, 95, 0.05);
+    --color-success: #38a169;
+    --color-error: #e53e3e;
+    --color-error: #ef4444;
+    --font-display: 'DM Serif Display', Georgia, serif;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+    --max-width: 1280px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+    --transition: 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    --transition-fast: 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    --shadow-glow: 0 0 60px rgba(201, 168, 76, 0.08);
+    --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  /* ============================
+     RESET & BASE
+     ============================ */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+  a { color: inherit; text-decoration: none; }
+  img { max-width: 100%; display: block; }
+
+  /* ============================
+     SCROLLBAR
+     ============================ */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--color-bg); }
+  ::-webkit-scrollbar-thumb { background: var(--color-gold-dark); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-gold); }
+
+  /* ============================
+     AMBIENT CANVAS
+     ============================ */
+  #ambient-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  /* ============================
+     NAV
+     ============================ */
+  nav {
+    position: fixed;
+    top: 12px; left: 12px; right: 12px;
+    z-index: 100;
+    padding: 0 24px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    max-width: var(--max-width);
+    margin: 0 auto;
+    transition: var(--transition);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  nav.scrolled {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: var(--color-border);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    color: var(--color-text);
+  }
+  .nav-logo svg { width: 28px; height: 28px; }
+  .nav-logo span { color: var(--color-gold); }
+  .nav-links { display: flex; align-items: center; gap: 28px; }
+  .nav-links a {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    transition: var(--transition-fast);
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0;
+    width: 0; height: 1.5px;
+    background: var(--color-gold);
+    transition: var(--transition);
+  }
+  .nav-links a:hover { color: var(--color-text); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-cta {
+    padding: 8px 20px;
+    border: 1px solid var(--color-gold);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-gold);
+    transition: var(--transition-fast);
+    cursor: pointer;
+    background: transparent;
+  }
+  .nav-cta:hover {
+    background: var(--color-gold);
+    color: var(--color-navy);
+  }
+  .nav-mobile-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--color-text);
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  /* ============================
+     HERO
+     ============================ */
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 100px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--color-gold);
+    background: rgba(201, 168, 76, 0.06);
+    margin-bottom: 28px;
+    letter-spacing: 0.3px;
+    opacity: 0;
+    transform: translateY(16px);
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero-badge .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--color-success);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.8rem, 7vw, 5.2rem);
+    line-height: 1.05;
+    font-weight: 400;
+    max-width: 900px;
+    margin: 0 auto 20px;
+    opacity: 0;
+    transform: translateY(24px);
+    animation: fadeUp 0.8s 0.4s forwards;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--color-gold);
+  }
+  .hero-sub {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: var(--color-text-secondary);
+    max-width: 580px;
+    margin: 0 auto 40px;
+    line-height: 1.7;
+    opacity: 0;
+    transform: translateY(16px);
+    animation: fadeUp 0.8s 0.6s forwards;
+  }
+
+  .hero-search {
+    position: relative;
+    width: 100%;
+    max-width: 640px;
+    opacity: 0;
+    transform: translateY(16px);
+    animation: fadeUp 0.8s 0.8s forwards;
+  }
+  .hero-search-inner {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: var(--color-bg-alt);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    padding: 4px;
+    transition: var(--transition);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.04), 0 0 80px rgba(201, 168, 76, 0.04);
+  }
+  .hero-search-inner:focus-within {
+    border-color: var(--color-gold);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06), 0 0 100px rgba(201, 168, 76, 0.08);
+  }
+  .hero-search-inner svg {
+    flex-shrink: 0;
+    margin-left: 16px;
+    color: var(--color-text-muted);
+  }
+  .hero-search-inner input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 14px 12px;
+    font-size: 1rem;
+    font-family: var(--font-sans);
+    color: var(--color-text);
+  }
+  .hero-search-inner input::placeholder { color: var(--color-text-muted); }
+  .hero-search-inner button {
+    padding: 10px 24px;
+    background: var(--color-gold);
+    color: var(--color-navy);
+    border: none;
+    border-radius: 11px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    font-family: var(--font-sans);
+    white-space: nowrap;
+  }
+  .hero-search-inner button:hover {
+    background: var(--color-gold-light);
+    transform: scale(1.02);
+  }
+  .hero-search-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+  }
+  .hero-search-hint kbd {
+    padding: 1px 7px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    background: rgba(255,255,255,0.04);
+  }
+
+  .hero-scroll-indicator {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text-muted);
+    font-size: 0.72rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 0.8s 1.2s forwards;
+  }
+  .hero-scroll-indicator .mouse {
+    width: 22px; height: 34px;
+    border: 1.5px solid var(--color-text-muted);
+    border-radius: 12px;
+    position: relative;
+  }
+  .hero-scroll-indicator .mouse::after {
+    content: '';
+    position: absolute;
+    top: 6px; left: 50%;
+    transform: translateX(-50%);
+    width: 3px; height: 8px;
+    background: var(--color-gold);
+    border-radius: 2px;
+    animation: scrollWheel 2s ease-in-out infinite;
+  }
+  @keyframes scrollWheel {
+    0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ============================
+     SECTION COMMON
+     ============================ */
+  section {
+    position: relative;
+    z-index: 1;
+    padding: 100px 24px;
+  }
+  .section-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--color-gold);
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .section-sub {
+    font-size: 1.05rem;
+    color: var(--color-text-secondary);
+    max-width: 560px;
+    line-height: 1.7;
+  }
+  .section-center {
+    text-align: center;
+  }
+  .section-center .section-sub {
+    margin: 0 auto;
+  }
+  .inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+  }
+
+  /* ============================
+     STATS BAR
+     ============================ */
+  .stats {
+    padding: 60px 24px;
+    background: #edf0f5;
+    border-top: 1px solid var(--color-border-light);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    max-width: var(--max-width);
+    margin: 0 auto;
+    background: var(--color-border-light);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .stat-card {
+    background: var(--color-bg-alt);
+    padding: 40px 24px;
+    text-align: center;
+  }
+  .stat-number {
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 4vw, 3.4rem);
+    color: var(--color-gold);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-label {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+  .stat-suffix {
+    font-size: 0.6em;
+    vertical-align: super;
+    opacity: 0.7;
+  }
+
+  /* ============================
+     BENTO FEATURES
+     ============================ */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+    margin-top: 48px;
+  }
+  .feature-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    padding: 32px 28px;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--color-gold), transparent);
+    opacity: 0;
+    transition: var(--transition);
+  }
+  .feature-card:hover {
+    border-color: var(--color-border);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+  }
+  .feature-card:hover::before { opacity: 1; }
+  .feature-card .icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: rgba(201, 168, 76, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    color: var(--color-gold);
+  }
+  .feature-card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .feature-card p {
+    font-size: 0.88rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+  .feature-card-wide { grid-column: span 3; }
+  .feature-card-med { grid-column: span 2; }
+  .feature-card-tall { grid-column: span 2; grid-row: span 2; }
+  .feature-card-full { grid-column: 1 / -1; }
+
+  /* ============================
+     JURISDICTIONS
+     ============================ */
+  .jurisdictions {
+    background: #edf0f5;
+  }
+  .jur-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 48px;
+  }
+  .jur-card {
+    padding: 24px 20px;
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-card);
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: center;
+  }
+  .jur-card:hover {
+    border-color: var(--color-gold);
+    background: rgba(201, 168, 76, 0.04);
+    transform: translateY(-2px);
+  }
+  .jur-card .code {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-gold);
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+  }
+  .jur-card .name {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .jur-card .count {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-top: 4px;
+  }
+
+  /* ============================
+     HOW IT WORKS
+     ============================ */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    margin-top: 56px;
+  }
+  .step {
+    text-align: center;
+    position: relative;
+  }
+  .step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 32px; right: -16px;
+    width: 32px; height: 1px;
+    background: linear-gradient(90deg, var(--color-gold), transparent);
+  }
+  .step-number {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    border: 2px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--color-gold);
+    position: relative;
+  }
+  .step-number::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1px solid rgba(201, 168, 76, 0.1);
+  }
+  .step h3 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+  .step p {
+    font-size: 0.88rem;
+    color: var(--color-text-secondary);
+    max-width: 280px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* ============================
+     TRUST
+     ============================ */
+  .trust-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 40px 60px;
+    margin-top: 48px;
+    align-items: center;
+  }
+  .trust-item {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    opacity: 0.5;
+    transition: var(--transition-fast);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .trust-item:hover { opacity: 0.8; }
+
+  .testimonial-card {
+    max-width: 640px;
+    margin: 48px auto 0;
+    padding: 40px;
+    background: var(--color-bg-card);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    text-align: center;
+  }
+  .testimonial-card blockquote {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    line-height: 1.7;
+    color: var(--color-text-secondary);
+    font-style: italic;
+    margin-bottom: 20px;
+    quotes: "“" "”" "‘" "’";
+  }
+  .testimonial-card blockquote::before { content: open-quote; color: var(--color-gold); }
+  .testimonial-card blockquote::after { content: close-quote; color: var(--color-gold); }
+  .testimonial-card .attribution {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .testimonial-card .role {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-top: 4px;
+  }
+
+  /* ============================
+     CTA BANNER
+     ============================ */
+  .cta-banner {
+    background: linear-gradient(135deg, rgba(201, 168, 76, 0.06), rgba(30, 58, 95, 0.04));
+    border-top: 1px solid var(--color-border-light);
+    border-bottom: 1px solid var(--color-border-light);
+    text-align: center;
+    padding: 100px 24px;
+  }
+  .cta-banner h2 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin-bottom: 16px;
+  }
+  .cta-banner p {
+    color: var(--color-text-secondary);
+    margin-bottom: 36px;
+    font-size: 1.05rem;
+  }
+  .cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 36px;
+    background: var(--color-gold);
+    color: var(--color-navy);
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    font-family: var(--font-sans);
+  }
+  .cta-button:hover {
+    background: var(--color-gold-light);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(201, 168, 76, 0.2);
+  }
+  .cta-button svg { transition: var(--transition-fast); }
+  .cta-button:hover svg { transform: translateX(3px); }
+  .cta-note {
+    margin-top: 16px;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+
+  /* ============================
+     FOOTER
+     ============================ */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--color-border-light);
+    padding: 48px 24px 32px;
+  }
+  .footer-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+  }
+  .footer-brand svg { width: 28px; height: 28px; margin-bottom: 12px; }
+  .footer-brand p {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    max-width: 300px;
+    line-height: 1.7;
+  }
+  .footer-col h4 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-gold);
+    margin-bottom: 16px;
+  }
+  .footer-col a {
+    display: block;
+    font-size: 0.88rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 10px;
+    transition: var(--transition-fast);
+  }
+  .footer-col a:hover { color: var(--color-text); }
+  .footer-bottom {
+    max-width: var(--max-width);
+    margin: 32px auto 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+  }
+
+  /* ============================
+     REVEAL ANIMATIONS
+     ============================ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* ============================
+     PAGE OVERLAY
+     ============================ */
+  .page-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: var(--color-bg);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+    pointer-events: none;
+  }
+  .page-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
+  .page-overlay .spinner {
+    width: 32px; height: 32px;
+    border: 2px solid var(--color-border);
+    border-top-color: var(--color-gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ============================
+     RESPONSIVE
+     ============================ */
+  @media (max-width: 1024px) {
+    .features-grid { grid-template-columns: repeat(2, 1fr); }
+    .feature-card-wide { grid-column: span 2; }
+    .feature-card-med { grid-column: span 1; }
+    .feature-card-tall { grid-column: span 1; grid-row: span 1; }
+    .jur-grid { grid-template-columns: repeat(3, 1fr); }
+    .footer-inner { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    nav { top: 8px; left: 8px; right: 8px; padding: 0 16px; height: 56px; }
+    .nav-links { display: none; }
+    .nav-mobile-toggle { display: flex; }
+    .hero { min-height: 90vh; padding: 100px 20px 60px; }
+    .hero h1 { font-size: clamp(2rem, 10vw, 2.8rem); }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); border-radius: var(--radius-md); }
+    .stat-card { padding: 28px 16px; }
+    .features-grid { grid-template-columns: 1fr; gap: 12px; margin-top: 32px; }
+    .feature-card-wide, .feature-card-med, .feature-card-tall { grid-column: 1; }
+    .jur-grid { grid-template-columns: repeat(2, 1fr); }
+    .steps { grid-template-columns: 1fr; gap: 40px; margin-top: 40px; }
+    .step:not(:last-child)::after { display: none; }
+    .trust-grid { gap: 24px 32px; }
+    .testimonial-card { padding: 28px 20px; }
+    .footer-inner { grid-template-columns: 1fr; gap: 32px; }
+    .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+    section { padding: 60px 20px; }
+  }
+
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .jur-grid { grid-template-columns: 1fr 1fr; }
+    .hero-search-inner { flex-direction: column; padding: 12px; gap: 8px; }
+    .hero-search-inner svg { display: none; }
+    .hero-search-inner input { width: 100%; padding: 10px 0; }
+    .hero-search-inner button { width: 100%; justify-content: center; }
+  }
+
+  /* ============================
+     REDUCED MOTION
+     ============================ */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+    .reveal { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================
+     PAGE LOAD OVERLAY
+     ============================ -->
+<div class="page-overlay" id="page-overlay">
+  <div class="spinner"></div>
+</div>
+
+<!-- ============================
+     AMBIENT CANVAS
+     ============================ -->
+<canvas id="ambient-canvas"></canvas>
+
+<!-- ============================
+     NAV
+     ============================ -->
+<nav id="navbar">
+  <a href="/" class="nav-logo">
+    <svg viewBox="0 0 28 28" fill="none">
+      <rect x="2" y="6" width="24" height="18" rx="3" stroke="#c9a84c" stroke-width="1.5"/>
+      <path d="M14 2L14 14L10 10L6 14L6 2" stroke="#c9a84c" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M9 19H19" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M9 22H16" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    Case<span>Outcomes</span>
+  </a>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#jurisdictions">Jurisdictions</a>
+    <a href="#how">How It Works</a>
+    <a href="https://www.caseoutcomes.com.au/austlii/databases.html" target="_blank">Databases</a>
+  </div>
+  <button class="nav-cta" onclick="document.getElementById('hero-search-input').focus()">Search Now</button>
+  <button class="nav-mobile-toggle" aria-label="Toggle menu">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M4 6h16M4 12h16M4 18h16"/>
+    </svg>
+  </button>
+</nav>
+
+<!-- ============================
+     HERO
+     ============================ -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    Free Access &mdash; 1,061 Legal Databases
+  </div>
+
+  <h1>Criminal Case Outcomes.<br>Search Australia&rsquo;s <em>Legal History</em>.</h1>
+
+  <p class="hero-sub">
+    The most comprehensive public database of Australian criminal case outcomes &mdash;
+    spanning 8 jurisdictions, over 100 years of legal history, and 1.5 million judgments.
+  </p>
+
+  <div class="hero-search">
+    <form class="hero-search-inner" action="https://www.caseoutcomes.com.au/austlii/search.html" method="get" target="_blank">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input id="hero-search-input" type="text" name="query" placeholder="Search by name, offence, jurisdiction, or case citation&hellip;" autocomplete="off">
+      <button type="submit">Search</button>
+    </form>
+    <div class="hero-search-hint">
+      <kbd>&#8984;</kbd> <kbd>K</kbd> to search &middot; Try: <a href="https://www.caseoutcomes.com.au/austlii/search.html?query=robbery" target="_blank" style="color:var(--color-gold);text-decoration:underline;">robbery</a>, <a href="https://www.caseoutcomes.com.au/austlii/search.html?query=manslaughter" target="_blank" style="color:var(--color-gold);text-decoration:underline;">manslaughter</a>, <a href="https://www.caseoutcomes.com.au/austlii/search.html?query=NSW+Supreme+Court" target="_blank" style="color:var(--color-gold);text-decoration:underline;">NSW Supreme Court</a>
+    </div>
+  </div>
+
+  <div class="hero-scroll-indicator">
+    <div class="mouse"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- ============================
+     STATS
+     ============================ -->
+<section class="stats">
+  <div class="stats-grid">
+    <div class="stat-card reveal">
+      <div class="stat-number" data-count="1502739">0</div>
+      <div class="stat-label">Cases &amp; Decisions</div>
+    </div>
+    <div class="stat-card reveal reveal-delay-1">
+      <div class="stat-number" data-count="1061">0</div>
+      <div class="stat-label">Databases</div>
+    </div>
+    <div class="stat-card reveal reveal-delay-2">
+      <div class="stat-number" data-count="8">0</div>
+      <div class="stat-label">Jurisdictions</div>
+    </div>
+    <div class="stat-card reveal reveal-delay-3">
+      <div class="stat-number" data-count="1788" data-prefix="Since ">Since 1788</div>
+      <div class="stat-label">Years of Legal History</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================
+     FEATURES
+     ============================ -->
+<section id="features">
+  <div class="inner section-center">
+    <p class="section-label reveal">Powerful Search</p>
+    <h2 class="section-title reveal reveal-delay-1">Search Every Dimension<br>of a Criminal Case</h2>
+    <p class="section-sub reveal reveal-delay-2">Cross-reference across courts, jurisdictions, offence types, and time periods. One interface to Australia&rsquo;s entire criminal law landscape.</p>
+  </div>
+
+  <div class="inner features-grid">
+    <div class="feature-card feature-card-wide reveal reveal-delay-1">
+      <div class="icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+      </div>
+      <h3>Search by Name</h3>
+      <p>Find any defendant, appellant, or party across all Australian courts. Search full names, partial matches, or phonetic variants using our advanced text engine. Results include linked case histories and related proceedings.</p>
+    </div>
+
+    <div class="feature-card feature-card-med reveal reveal-delay-2">
+      <div class="icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 6v6l4 2"/>
+        </svg>
+      </div>
+      <h3>By Year &amp; Era</h3>
+      <p>Filter by specific year or date range. From colonial-era proceedings to today&rsquo;s High Court decisions.</p>
+    </div>
+
+    <div class="feature-card feature-card-med reveal reveal-delay-3">
+      <div class="icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M2 18h20"/><rect x="4" y="4" width="16" height="14" rx="2"/><path d="M10 8h4"/><path d="M10 12h4"/><path d="M10 16h4"/>
+        </svg>
+      </div>
+      <h3>By Court Level</h3>
+      <p>Supreme Court, District Court, Magistrates Court, High Court &mdash; browse by judicial level or drill into specific court registries.</p>
+    </div>
+
+    <div class="feature-card feature-card-med reveal reveal-delay-1">
+      <div class="icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <h3>By Offence Type</h3>
+      <p>Filter by specific charges &mdash; from minor offences to serious indictable crimes. Includes offence classifications across all states.</p>
+    </div>
+
+    <div class="feature-card feature-card-med reveal reveal-delay-2">
+      <div class="icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/><path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9"/>
+        </svg>
+      </div>
+      <h3>By Jurisdiction</h3>
+      <p>State-by-state or territory-wide. Compare how different jurisdictions have handled similar offences across time.</p>
+    </div>
+
+    <div class="feature-card feature-card-wide reveal reveal-delay-3">
+      <div class="icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+        </svg>
+      </div>
+      <h3>Full Judgment Text &amp; Citations</h3>
+      <p>Access complete judgment documents with official citations, catchwords, and linked references. Every case cross-referenced with related proceedings, appeal history, and subsequent citations. Export-ready for legal research.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================
+     JURISDICTIONS
+     ============================ -->
+<section id="jurisdictions" class="jurisdictions">
+  <div class="inner section-center">
+    <p class="section-label reveal">All Jurisdictions</p>
+    <h2 class="section-title reveal reveal-delay-1">Every Australian Court,<br>One Index</h2>
+    <p class="section-sub reveal reveal-delay-2">Covering all states, territories, and New Zealand. Each jurisdiction&rsquo;s complete criminal case history at your fingertips.</p>
+  </div>
+
+  <div class="inner jur-grid">
+    <a href="https://www.caseoutcomes.com.au/austlii/au/cth/index.html" target="_blank" class="jur-card reveal reveal-delay-1">
+      <div class="code">CTH</div>
+      <div class="name">Commonwealth</div>
+      <div class="count">Federal Courts</div>
+    </a>
+    <a href="https://www.caseoutcomes.com.au/austlii/au/nsw/index.html" target="_blank" class="jur-card reveal reveal-delay-1">
+      <div class="code">NSW</div>
+      <div class="name">New South Wales</div>
+      <div class="count">Supreme &amp; District Courts</div>
+    </a>
+    <a href="https://www.caseoutcomes.com.au/austlii/au/vic/index.html" target="_blank" class="jur-card reveal reveal-delay-2">
+      <div class="code">VIC</div>
+      <div class="name">Victoria</div>
+      <div class="count">Supreme &amp; County Courts</div>
+    </a>
+    <a href="https://www.caseoutcomes.com.au/austlii/au/qld/index.html" target="_blank" class="jur-card reveal reveal-delay-2">
+      <div class="code">QLD</div>
+      <div class="name">Queensland</div>
+      <div class="count">Supreme &amp; District Courts</div>
+    </a>
+    <a href="https://www.caseoutcomes.com.au/austlii/au/wa/index.html" target="_blank" class="jur-card reveal reveal-delay-3">
+      <div class="code">WA</div>
+      <div class="name">Western Australia</div>
+      <div class="count">Supreme &amp; District Courts</div>
+    </a>
+    <a href="https://www.caseoutcomes.com.au/austlii/au/sa/index.html" target="_blank" class="jur-card reveal reveal-delay-3">
+      <div class="code">SA</div>
+      <div class="name">South Australia</div>
+      <div class="count">Supreme Court</div>
+    </a>
+    <a href="https://www.caseoutcomes.com.au/austlii/au/tas/index.html" target="_blank" class="jur-card reveal reveal-delay-4">
+      <div class="code">TAS</div>
+      <div class="name">Tasmania</div>
+      <div class="count">Supreme Court</div>
+    </a>
+    <a href="https://www.caseoutcomes.com.au/austlii/au/act/index.html" target="_blank" class="jur-card reveal reveal-delay-4">
+      <div class="code">ACT</div>
+      <div class="name">ACT</div>
+      <div class="count">Supreme Court</div>
+    </a>
+    <a href="https://www.caseoutcomes.com.au/austlii/au/nt/index.html" target="_blank" class="jur-card reveal reveal-delay-1">
+      <div class="code">NT</div>
+      <div class="name">Northern Territory</div>
+      <div class="count">Supreme Court</div>
+    </a>
+    <a href="https://www.caseoutcomes.com.au/nzlii/databases.html" target="_blank" class="jur-card reveal reveal-delay-2">
+      <div class="code">NZ</div>
+      <div class="name">New Zealand</div>
+      <div class="count">All Courts</div>
+    </a>
+    <a href="https://www.caseoutcomes.com.au/austlii/databases.html" target="_blank" class="jur-card reveal reveal-delay-3" style="grid-column:span 2;">
+      <div class="code">+1,061</div>
+      <div class="name">All Databases</div>
+      <div class="count">Cases &bull; Legislation &bull; Journals &bull; Treaties</div>
+    </a>
+  </div>
+</section>
+
+<!-- ============================
+     HOW IT WORKS
+     ============================ -->
+<section id="how">
+  <div class="inner section-center">
+    <p class="section-label reveal">Simple Workflow</p>
+    <h2 class="section-title reveal reveal-delay-1">From Query to Authority,<br>in Three Steps</h2>
+    <p class="section-sub reveal reveal-delay-2">Legal research shouldn&rsquo;t be complicated. CaseOutcomes makes it as simple as search, browse, cite.</p>
+  </div>
+
+  <div class="inner steps">
+    <div class="step reveal reveal-delay-1">
+      <div class="step-number">01</div>
+      <h3>Search Across Everything</h3>
+      <p>Enter a name, offence, court, or citation. Our search engine indexes over 1.5 million judgments across all Australian jurisdictions simultaneously.</p>
+    </div>
+    <div class="step reveal reveal-delay-2">
+      <div class="step-number">02</div>
+      <h3>Browse with Precision</h3>
+      <p>Filter by court level, year range, offence category, or jurisdiction. Cross-reference related cases, appeal histories, and legislative references.</p>
+    </div>
+    <div class="step reveal reveal-delay-3">
+      <div class="step-number">03</div>
+      <h3>Cite with Confidence</h3>
+      <p>Every case includes official citations, catchwords, and full judgment text. Export references directly for your legal research or submissions.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================
+     TRUST & TESTIMONIAL
+     ============================ -->
+<section class="jurisdictions">
+  <div class="inner section-center">
+    <p class="section-label reveal">Trusted Platform</p>
+    <h2 class="section-title reveal reveal-delay-1">Relied Upon by Australia&rsquo;s<br>Legal Institutions</h2>
+    <p class="section-sub reveal reveal-delay-2">CaseOutcomes powers legal research across the profession, from top-tier firms to community legal centres.</p>
+
+    <div class="trust-grid reveal reveal-delay-3">
+      <span class="trust-item">University of Technology Sydney</span>
+      <span class="trust-item">Law Society of NSW</span>
+      <span class="trust-item">Supreme Court Libraries</span>
+      <span class="trust-item">Legal Aid Commissions</span>
+      <span class="trust-item">Community Legal Centres</span>
+    </div>
+
+    <div class="testimonial-card reveal reveal-delay-4">
+      <blockquote>
+        CaseOutcomes has transformed how we conduct criminal law research.
+        Having a century of case outcomes across all Australian jurisdictions
+        in one searchable interface is invaluable. It&rsquo;s our first stop for
+        every matter.
+      </blockquote>
+      <div class="attribution">Sarah Chen</div>
+      <div class="role">Senior Associate, Criminal Law Practice &mdash; Sydney</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================
+     CTA
+     ============================ -->
+<section class="cta-banner">
+  <div class="inner">
+    <h2 class="reveal">Start Your Search Now</h2>
+    <p class="reveal reveal-delay-1">Free access to 1.5 million+ Australian criminal case outcomes. No registration required.</p>
+    <a href="https://www.caseoutcomes.com.au/austlii/search.html" target="_blank" class="cta-button reveal reveal-delay-2">
+      Search the Database
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+      </svg>
+    </a>
+    <p class="cta-note reveal reveal-delay-3">Free &bull; No account needed &bull; 1,061 databases &bull; Updated daily</p>
+  </div>
+</section>
+
+<!-- ============================
+     FOOTER
+     ============================ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <svg viewBox="0 0 28 28" fill="none">
+        <rect x="2" y="6" width="24" height="18" rx="3" stroke="#c9a84c" stroke-width="1.5"/>
+        <path d="M14 2L14 14L10 10L6 14L6 2" stroke="#c9a84c" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M9 19H19" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M9 22H16" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <p>CaseOutcomes is Australia&rsquo;s most comprehensive public database of criminal case outcomes, powered by the Australasian Legal Information Institute (AustLII) and hosted by UTS Faculty of Law.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Search</h4>
+      <a href="https://www.caseoutcomes.com.au/austlii/search.html" target="_blank">All Databases</a>
+      <a href="https://www.caseoutcomes.com.au/austlii/au/cth/index.html" target="_blank">Commonwealth</a>
+      <a href="https://www.caseoutcomes.com.au/austlii/au/nsw/index.html" target="_blank">New South Wales</a>
+      <a href="https://www.caseoutcomes.com.au/austlii/au/vic/index.html" target="_blank">Victoria</a>
+      <a href="https://www.caseoutcomes.com.au/austlii/au/qld/index.html" target="_blank">Queensland</a>
+    </div>
+    <div class="footer-col">
+      <h4>Jurisdictions</h4>
+      <a href="https://www.caseoutcomes.com.au/austlii/au/wa/index.html" target="_blank">Western Australia</a>
+      <a href="https://www.caseoutcomes.com.au/austlii/au/sa/index.html" target="_blank">South Australia</a>
+      <a href="https://www.caseoutcomes.com.au/austlii/au/tas/index.html" target="_blank">Tasmania</a>
+      <a href="https://www.caseoutcomes.com.au/austlii/au/act/index.html" target="_blank">ACT</a>
+      <a href="https://www.caseoutcomes.com.au/austlii/au/nt/index.html" target="_blank">Northern Territory</a>
+      <a href="https://www.caseoutcomes.com.au/nzlii/databases.html" target="_blank">New Zealand</a>
+    </div>
+    <div class="footer-col">
+      <h4>About</h4>
+      <a href="https://www.caseoutcomes.com.au/austlii/databases.html" target="_blank">Database List</a>
+      <a href="https://austlii.edu.au/" target="_blank">AustLII</a>
+      <a href="https://www.uts.edu.au/" target="_blank">UTS Faculty of Law</a>
+      <a href="https://www.caseoutcomes.com.au/austlii/index.html" target="_blank">Classic Site</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 CaseOutcomes &mdash; Powered by AustLII</span>
+    <span>Free access to Australia&rsquo;s legal history</span>
+  </div>
+</footer>
+
+<!-- ============================
+     JAVASCRIPT
+     ============================ -->
+<script>
+  (function() {
+    'use strict';
+
+    // ===== PAGE LOAD =====
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        document.getElementById('page-overlay').classList.add('hidden');
+      }, 400);
+    });
+
+    // ===== NAVBAR SCROLL =====
+    const nav = document.getElementById('navbar');
+    let lastScroll = 0;
+    window.addEventListener('scroll', function() {
+      const y = window.scrollY;
+      if (y > 60) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+      lastScroll = y;
+    }, { passive: true });
+
+    // ===== SCROLL REVEAL =====
+    const reveals = document.querySelectorAll('.reveal');
+    const ro = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    reveals.forEach(function(el) { ro.observe(el); });
+
+    // ===== COUNTER ANIMATION =====
+    const counters = document.querySelectorAll('.stat-number[data-count]');
+    const counterObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting && !entry.target.classList.contains('counted')) {
+          entry.target.classList.add('counted');
+          animateCounter(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    counters.forEach(function(el) { counterObserver.observe(el); });
+
+    function animateCounter(el) {
+      const target = parseInt(el.getAttribute('data-count'), 10);
+      const prefix = el.getAttribute('data-prefix') || '';
+      const duration = 2000;
+      const start = performance.now();
+
+      function step(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        // easeOutExpo
+        const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+        const current = Math.floor(eased * target);
+
+        if (target > 999) {
+          el.textContent = prefix + current.toLocaleString();
+        } else {
+          el.textContent = prefix + current;
+        }
+
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          el.textContent = prefix + target.toLocaleString();
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    // ===== AMBIENT CANVAS (Grid + Orbs) =====
+    const canvas = document.getElementById('ambient-canvas');
+    const ctx = canvas.getContext('2d');
+    let w, h;
+
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
+
+    // Gradient orbs
+    const orbs = [
+      { x: 0.2, y: 0.3, r: 0.25, color: 'rgba(201, 168, 76, 0.04)', dx: 0.0003, dy: 0.0002 },
+      { x: 0.8, y: 0.5, r: 0.2, color: 'rgba(99, 102, 241, 0.04)', dx: -0.0002, dy: 0.0003 },
+      { x: 0.5, y: 0.7, r: 0.3, color: 'rgba(201, 168, 76, 0.03)', dx: 0.0001, dy: -0.0003 },
+    ];
+
+    let mouseX = 0, mouseY = 0;
+    document.addEventListener('mousemove', function(e) {
+      mouseX = e.clientX / w;
+      mouseY = e.clientY / h;
+    }, { passive: true });
+
+    let time = 0;
+
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+      time += 0.005;
+
+      // Grid lines
+      ctx.strokeStyle = 'rgba(201, 168, 76, 0.03)';
+      ctx.lineWidth = 1;
+      const spacing = 60;
+      const offsetX = (time * 20) % spacing;
+
+      // Vertical lines
+      for (let x = offsetX; x < w; x += spacing) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, h);
+        ctx.stroke();
+      }
+
+      // Horizontal lines
+      const offsetY = (time * 10) % spacing;
+      for (let y = offsetY; y < h; y += spacing) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+      }
+
+      // Orbs
+      orbs.forEach(function(orb) {
+        orb.x += orb.dx + (mouseX - 0.5) * 0.0001;
+        orb.y += orb.dy + (mouseY - 0.5) * 0.0001;
+        orb.x = (orb.x + 1) % 1;
+        orb.y = (orb.y + 1) % 1;
+        const px = orb.x * w;
+        const py = orb.y * h;
+        const pr = orb.r * Math.min(w, h);
+        const grad = ctx.createRadialGradient(px, py, 0, px, py, pr);
+        grad.addColorStop(0, orb.color);
+        grad.addColorStop(0.5, orb.color);
+        grad.addColorStop(1, 'transparent');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(px, py, pr, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      requestAnimationFrame(draw);
+    }
+    draw();
+
+    // ===== KEYBOARD SHORTCUT =====
+    document.addEventListener('keydown', function(e) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        document.getElementById('hero-search-input').focus();
+      }
+    });
+
+  })();
+</script>
+</body>
+</html>
