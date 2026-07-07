@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Hyperframes build artifacts
+nsopw-animated/snapshots/
+nsopw-animated/nsopw-video.mp4
+
+# Chrome headless shell (downloaded for rendering)
+chrome-headless-shell/
+
+# Skills (reinstallable via npx skills add heygen-com/hyperframes)
+.agents/
+skills-lock.json
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/

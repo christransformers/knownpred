@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet">
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #0e0d0c;
+        font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: #f4f0ea;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #0e0d0c;
+      }
+
+      .clip {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+      }
+
+      /* Shared scene background — dark warm gradient */
+      .scene-bg {
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(ellipse at 70% 30%, rgba(37, 99, 235, 0.08) 0%, transparent 50%),
+          radial-gradient(ellipse at 30% 80%, rgba(212, 160, 176, 0.05) 0%, transparent 50%),
+          linear-gradient(135deg, #0e0d0c 0%, #1a1816 50%, #0e0d0c 100%);
+      }
+
+      /* Film grain texture overlay */
+      .grain {
+        position: absolute;
+        inset: 0;
+        opacity: 0.04;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        pointer-events: none;
+      }
+
+      /* Vignette */
+      .vignette {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at center, transparent 40%, rgba(14, 13, 12, 0.5) 100%);
+        pointer-events: none;
+      }
+
+      /* === SCENE 1: Hero Brand Reveal === */
+      #scene-hero {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .hero-glow {
+        position: absolute;
+        width: 800px;
+        height: 800px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(37, 99, 235, 0.12) 0%, transparent 70%);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 24px;
+      }
+
+      .hero-overline {
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: 0.35em;
+        text-transform: uppercase;
+        color: #2563eb;
+      }
+
+      .hero-title {
+        font-family: 'Playfair Display', Georgia, serif;
+        font-weight: 300;
+        font-size: 82px;
+        color: #f4f0ea;
+        line-height: 1.1;
+      }
+
+      .hero-title .accent {
+        font-style: italic;
+        color: #d4a0b0;
+      }
+
+      .hero-divider {
+        width: 60px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #706050, transparent);
+      }
+
+      .hero-subtitle {
+        font-size: 20px;
+        font-weight: 300;
+        color: #c8c0b4;
+        letter-spacing: 0.05em;
+        max-width: 700px;
+        line-height: 1.6;
+      }
+
+      .hero-stats {
+        display: flex;
+        gap: 48px;
+        margin-top: 20px;
+      }
+
+      .hero-stat {
+        text-align: center;
+      }
+
+      .hero-stat .num {
+        font-family: 'Playfair Display', Georgia, serif;
+        font-weight: 300;
+        font-size: 36px;
+        color: #f4f0ea;
+      }
+
+      .hero-stat .lbl {
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #9e9890;
+        margin-top: 6px;
+      }
+
+      /* Map dots animation */
+      .map-dots {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+      }
+
+      .map-dot {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: rgba(37, 99, 235, 0.6);
+        box-shadow: 0 0 12px rgba(37, 99, 235, 0.4);
+      }
+
+      /* === SCENE 2: Search Functionality === */
+      #scene-search {
+        display: flex;
+        align-items: center;
+        padding: 0 120px;
+      }
+
+      .search-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        gap: 80px;
+        align-items: center;
+        width: 100%;
+      }
+
+      .search-left {
+        flex: 1;
+      }
+
+      .search-overline {
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: #2563eb;
+        margin-bottom: 20px;
+      }
+
+      .search-title {
+        font-family: 'Playfair Display', Georgia, serif;
+        font-weight: 300;
+        font-size: 64px;
+        color: #f4f0ea;
+        line-height: 1.15;
+        margin-bottom: 24px;
+      }
+
+      .search-title i {
+        font-style: italic;
+        color: #d4a0b0;
+      }
+
+      .search-body {
+        font-size: 18px;
+        font-weight: 300;
+        color: #c8c0b4;
+        line-height: 1.7;
+        max-width: 500px;
+        margin-bottom: 32px;
+      }
+
+      .search-feature {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 14px 0;
+        border-bottom: 1px solid rgba(244, 240, 234, 0.06);
+      }
+
+      .search-feature:last-child {
+        border-bottom: none;
+      }
+
+      .search-feature .ico {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(37, 99, 235, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 16px;
+        color: #2563eb;
+      }
+
+      .search-feature .txt {
+        font-size: 16px;
+        font-weight: 300;
+        color: #c8c0b4;
+      }
+
+      .search-feature .txt strong {
+        color: #f4f0ea;
+        font-weight: 500;
+      }
+
+      /* Glass search card mockup */
+      .search-card {
+        flex: 0 0 480px;
+        background: rgba(244, 240, 234, 0.03);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(244, 240, 234, 0.08);
+        border-radius: 16px;
+        padding: 36px;
+        position: relative;
+      }
+
+      .search-card-label {
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        color: #9e9890;
+        margin-bottom: 20px;
+      }
+
+      .search-input-mock {
+        background: rgba(244, 240, 234, 0.05);
+        border: 1px solid rgba(244, 240, 234, 0.1);
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin-bottom: 12px;
+        font-size: 15px;
+        color: #706050;
+        font-family: 'DM Sans', sans-serif;
+      }
+
+      .search-input-mock.active {
+        border-color: rgba(37, 99, 235, 0.4);
+        background: rgba(37, 99, 235, 0.05);
+        color: #f4f0ea;
+      }
+
+      .search-btn-mock {
+        background: #2563eb;
+        color: #f4f0ea;
+        border: none;
+        border-radius: 8px;
+        padding: 14px;
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        text-align: center;
+        margin-top: 8px;
+        font-family: 'DM Sans', sans-serif;
+      }
+
+      /* === SCENE 3: Safety & Community === */
+      #scene-safety {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .safety-glow {
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(200, 152, 72, 0.08) 0%, transparent 70%);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .safety-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .safety-overline {
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: #c89848;
+      }
+
+      .safety-title {
+        font-family: 'Playfair Display', Georgia, serif;
+        font-weight: 300;
+        font-size: 72px;
+        color: #f4f0ea;
+        line-height: 1.12;
+      }
+
+      .safety-title i {
+        font-style: italic;
+        color: #d4a0b0;
+      }
+
+      .safety-body {
+        font-size: 20px;
+        font-weight: 300;
+        color: #c8c0b4;
+        line-height: 1.7;
+        max-width: 640px;
+      }
+
+      .safety-cards {
+        display: flex;
+        gap: 20px;
+        margin-top: 32px;
+      }
+
+      .safety-card {
+        background: rgba(244, 240, 234, 0.03);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(244, 240, 234, 0.06);
+        border-radius: 14px;
+        padding: 28px 24px;
+        width: 220px;
+        text-align: center;
+      }
+
+      .safety-card .card-ico {
+        font-size: 28px;
+        margin-bottom: 12px;
+      }
+
+      .safety-card .card-title {
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #f4f0ea;
+        margin-bottom: 8px;
+      }
+
+      .safety-card .card-desc {
+        font-size: 12px;
+        font-weight: 300;
+        color: #9e9890;
+        line-height: 1.5;
+      }
+
+      /* Connecting lines decoration */
+      .connect-line {
+        position: absolute;
+        width: 1px;
+        background: linear-gradient(180deg, transparent, rgba(37, 99, 235, 0.15), transparent);
+      }
+
+      .connect-line.l1 { left: 25%; top: 0; height: 100%; }
+      .connect-line.l2 { left: 50%; top: 0; height: 100%; }
+      .connect-line.l3 { left: 75%; top: 0; height: 100%; }
+
+      /* Footer brand bar */
+      .brand-bar {
+        position: absolute;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        z-index: 3;
+      }
+
+      .brand-bar .brand-name {
+        font-family: 'Playfair Display', Georgia, serif;
+        font-weight: 300;
+        font-size: 14px;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: #9e9890;
+      }
+
+      .brand-bar .brand-dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: #2563eb;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="10"
+      data-width="1920"
+      data-height="1080"
+    >
+      <!-- ========== SCENE 1: Hero Brand Reveal (0–4s) ========== -->
+      <div id="scene-hero" class="clip" data-start="0" data-duration="4" data-track-index="1">
+        <div class="scene-bg"></div>
+        <div class="grain"></div>
+
+        <!-- Map dots positioned like Australia -->
+        <div class="map-dots" id="map-dots">
+          <div class="map-dot" style="left: 35%; top: 55%;"></div>
+          <div class="map-dot" style="left: 45%; top: 45%;"></div>
+          <div class="map-dot" style="left: 55%; top: 40%;"></div>
+          <div class="map-dot" style="left: 60%; top: 55%;"></div>
+          <div class="map-dot" style="left: 50%; top: 65%;"></div>
+          <div class="map-dot" style="left: 42%; top: 60%;"></div>
+          <div class="map-dot" style="left: 65%; top: 48%;"></div>
+          <div class="map-dot" style="left: 38%; top: 50%;"></div>
+        </div>
+
+        <div class="hero-glow" id="hero-glow"></div>
+        <div class="vignette"></div>
+
+        <div class="hero-content" id="hero-content">
+          <div class="hero-overline" id="hero-overline">Australian Government · Attorney-General's Department</div>
+          <div class="hero-title" id="hero-title">
+            Diana Levitt<br>
+            National Sex Offender<br>
+            <span class="accent">Public Website</span>
+          </div>
+          <div class="hero-divider" id="hero-divider"></div>
+          <div class="hero-subtitle" id="hero-subtitle">
+            Search sex offender registries for all Australian states and territories,<br>
+            including Aboriginal and Torres Strait Islander Communities.
+          </div>
+          <div class="hero-stats" id="hero-stats">
+            <div class="hero-stat"><div class="num">8</div><div class="lbl">States & Territories</div></div>
+            <div class="hero-stat"><div class="num">24/7</div><div class="lbl">Available</div></div>
+            <div class="hero-stat"><div class="num">100%</div><div class="lbl">Secure</div></div>
+          </div>
+        </div>
+
+        <div class="brand-bar" id="hero-brand">
+          <span class="brand-name">NSOPW</span>
+          <span class="brand-dot"></span>
+          <span class="brand-name">Est. 2006</span>
+        </div>
+      </div>
+
+      <!-- ========== SCENE 2: Search Functionality (3.5–7s) ========== -->
+      <div id="scene-search" class="clip" data-start="3.5" data-duration="4" data-track-index="2">
+        <div class="scene-bg"></div>
+        <div class="grain"></div>
+        <div class="connect-line l1"></div>
+        <div class="connect-line l2"></div>
+        <div class="connect-line l3"></div>
+        <div class="vignette"></div>
+
+        <div class="search-content" id="search-content">
+          <div class="search-left">
+            <div class="search-overline" id="search-overline">How It Works</div>
+            <div class="search-title" id="search-title">
+              A National<br>
+              <i>Registry Network</i>
+            </div>
+            <div class="search-body" id="search-body">
+              The NSOPW connects you to sex offender registries across all Australian states and territories in one central, secure platform.
+            </div>
+            <div class="search-feature" id="feat-1">
+              <div class="ico">🔍</div>
+              <div class="txt"><strong>Single Search</strong> — One query searches all participating registries simultaneously</div>
+            </div>
+            <div class="search-feature" id="feat-2">
+              <div class="ico">🛡️</div>
+              <div class="txt"><strong>Official Data</strong> — Information sourced directly from government law enforcement registries</div>
+            </div>
+            <div class="search-feature" id="feat-3">
+              <div class="ico">🔒</div>
+              <div class="txt"><strong>Private &amp; Secure</strong> — Your searches are confidential and protected</div>
+            </div>
+          </div>
+
+          <div class="search-card" id="search-card">
+            <div class="search-card-label">Search the Registry</div>
+            <div class="search-input-mock" id="input-first">First Name (Required)</div>
+            <div class="search-input-mock" id="input-last">Last Name (Required)</div>
+            <div class="search-input-mock active" id="input-state">Select State or Territory ▾</div>
+            <div class="search-btn-mock" id="search-btn">Name Search</div>
+          </div>
+        </div>
+
+        <div class="brand-bar">
+          <span class="brand-name">NSOPW</span>
+          <span class="brand-dot"></span>
+          <span class="brand-name">Search</span>
+        </div>
+      </div>
+
+      <!-- ========== SCENE 3: Safety & Community (6.5–10s) ========== -->
+      <div id="scene-safety" class="clip" data-start="6.5" data-duration="3.5" data-track-index="3">
+        <div class="scene-bg"></div>
+        <div class="grain"></div>
+        <div class="safety-glow" id="safety-glow"></div>
+        <div class="vignette"></div>
+
+        <div class="safety-content" id="safety-content">
+          <div class="safety-overline" id="safety-overline">Safety &amp; Education</div>
+          <div class="safety-title" id="safety-title">
+            Stay Informed.<br>
+            Stay <i>Protected</i>.
+          </div>
+          <div class="safety-body" id="safety-body">
+            Knowledge is your first line of defense. Learn about prevention,<br>
+            recognize warning signs, and help protect your community.
+          </div>
+          <div class="safety-cards" id="safety-cards">
+            <div class="safety-card" id="card-1">
+              <div class="card-ico">🛡️</div>
+              <div class="card-title">How to Prevent</div>
+              <div class="card-desc">Resources and guidelines for keeping your family safe.</div>
+            </div>
+            <div class="safety-card" id="card-2">
+              <div class="card-ico">👁️</div>
+              <div class="card-title">How to Identify</div>
+              <div class="card-desc">Recognize potential warning signs and risk factors.</div>
+            </div>
+            <div class="safety-card" id="card-3">
+              <div class="card-ico">🤝</div>
+              <div class="card-title">How to Respond</div>
+              <div class="card-desc">Know how to act and where to get help.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="brand-bar">
+          <span class="brand-name">NSOPW</span>
+          <span class="brand-dot"></span>
+          <span class="brand-name">Safety</span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // === SCENE 1: Hero Brand Reveal (0–4s) ===
+      // Map dots pulse in
+      tl.from("#map-dots .map-dot", {
+        opacity: 0,
+        scale: 0,
+        duration: 0.6,
+        stagger: 0.08,
+        ease: "power2.out"
+      }, 0);
+
+      // Glow fades in and scales
+      tl.from("#hero-glow", {
+        opacity: 0,
+        scale: 0.5,
+        duration: 1.5,
+        ease: "power2.out"
+      }, 0);
+
+      // Overline slides down
+      tl.from("#hero-overline", {
+        opacity: 0,
+        y: -20,
+        duration: 0.6,
+        ease: "power3.out"
+      }, 0.3);
+
+      // Title words rise in
+      tl.from("#hero-title", {
+        opacity: 0,
+        y: 40,
+        duration: 1.0,
+        ease: "power3.out"
+      }, 0.5);
+
+      // Divider widens
+      tl.from("#hero-divider", {
+        opacity: 0,
+        scaleX: 0,
+        duration: 0.6,
+        ease: "power2.out"
+      }, 1.2);
+
+      // Subtitle fades in
+      tl.from("#hero-subtitle", {
+        opacity: 0,
+        y: 20,
+        duration: 0.7,
+        ease: "power3.out"
+      }, 1.4);
+
+      // Stats count up / fade in
+      tl.from("#hero-stats .hero-stat", {
+        opacity: 0,
+        y: 20,
+        duration: 0.5,
+        stagger: 0.12,
+        ease: "power2.out"
+      }, 1.8);
+
+      // Brand bar fades in
+      tl.from("#hero-brand", {
+        opacity: 0,
+        duration: 0.6,
+        ease: "power2.out"
+      }, 2.2);
+
+      // Hero scene exit — fade and scale slightly
+      tl.to("#scene-hero", {
+        opacity: 0,
+        scale: 1.03,
+        duration: 0.6,
+        ease: "power2.inOut"
+      }, 3.4);
+
+      // === SCENE 2: Search Functionality (3.5–7s) ===
+      // Scene enters
+      tl.from("#scene-search", {
+        opacity: 0,
+        duration: 0.5,
+        ease: "power2.out"
+      }, 3.5);
+
+      // Overline
+      tl.from("#search-overline", {
+        opacity: 0,
+        x: -20,
+        duration: 0.5,
+        ease: "power3.out"
+      }, 3.7);
+
+      // Title
+      tl.from("#search-title", {
+        opacity: 0,
+        y: 30,
+        duration: 0.7,
+        ease: "power3.out"
+      }, 3.9);
+
+      // Body text
+      tl.from("#search-body", {
+        opacity: 0,
+        y: 15,
+        duration: 0.5,
+        ease: "power3.out"
+      }, 4.3);
+
+      // Features stagger in
+      tl.from("#feat-1, #feat-2, #feat-3", {
+        opacity: 0,
+        x: -20,
+        duration: 0.5,
+        stagger: 0.15,
+        ease: "power3.out"
+      }, 4.6);
+
+      // Search card slides in from right
+      tl.from("#search-card", {
+        opacity: 0,
+        x: 60,
+        duration: 0.8,
+        ease: "power3.out"
+      }, 4.0);
+
+      // Search card inputs stagger
+      tl.from("#input-first, #input-last, #input-state, #search-btn", {
+        opacity: 0,
+        y: 15,
+        duration: 0.4,
+        stagger: 0.12,
+        ease: "power2.out"
+      }, 4.6);
+
+      // Search scene exit
+      tl.to("#scene-search", {
+        opacity: 0,
+        scale: 1.03,
+        duration: 0.5,
+        ease: "power2.inOut"
+      }, 6.5);
+
+      // === SCENE 3: Safety & Community (6.5–10s) ===
+      // Scene enters
+      tl.from("#scene-safety", {
+        opacity: 0,
+        duration: 0.5,
+        ease: "power2.out"
+      }, 6.5);
+
+      // Glow
+      tl.from("#safety-glow", {
+        opacity: 0,
+        scale: 0.5,
+        duration: 1.2,
+        ease: "power2.out"
+      }, 6.6);
+
+      // Overline
+      tl.from("#safety-overline", {
+        opacity: 0,
+        y: -15,
+        duration: 0.5,
+        ease: "power3.out"
+      }, 6.8);
+
+      // Title
+      tl.from("#safety-title", {
+        opacity: 0,
+        y: 30,
+        duration: 0.7,
+        ease: "power3.out"
+      }, 7.0);
+
+      // Body
+      tl.from("#safety-body", {
+        opacity: 0,
+        y: 15,
+        duration: 0.5,
+        ease: "power3.out"
+      }, 7.4);
+
+      // Cards stagger in
+      tl.from("#card-1, #card-2, #card-3", {
+        opacity: 0,
+        y: 30,
+        duration: 0.6,
+        stagger: 0.15,
+        ease: "power3.out"
+      }, 7.7);
+
+      // Final hold
+      tl.to("#scene-safety", {
+        opacity: 1,
+        duration: 1.0,
+        ease: "none"
+      }, 8.5);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
