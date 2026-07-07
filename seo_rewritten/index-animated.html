@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1920, height=1080" />
+  <title>Sarah Whitfield Community Protection Public Website — Animated</title>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      background: #0b1526;
+      color: #fff;
+      font-family: 'Roboto', system-ui, sans-serif;
+      overflow: hidden;
+    }
+
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+    }
+
+    .clip {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    /* Accent bar */
+    .accent-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 6px;
+      background: #AC1A06;
+    }
+
+    /* Hero / background */
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #0b1526 0%, #132940 40%, #1a3354 70%, #0b1526 100%);
+    }
+
+    .hero-pattern {
+      position: absolute;
+      inset: 0;
+      opacity: 0.05;
+      background-image:
+        radial-gradient(circle at 20% 80%, #fff 1px, transparent 1px),
+        radial-gradient(circle at 80% 20%, #fff 1px, transparent 1px),
+        radial-gradient(circle at 50% 50%, #fff 2px, transparent 2px);
+      background-size: 80px 80px, 120px 120px, 200px 200px;
+    }
+
+    .gov-seal {
+      width: 90px;
+      margin-bottom: 1rem;
+      filter: brightness(0) invert(1);
+      opacity: 0.9;
+    }
+
+    /* Typography */
+    h1 { font-size: 72px; font-weight: 900; margin: 0 0 0.5rem; letter-spacing: -1px; }
+    h2 { font-size: 52px; font-weight: 700; margin: 0 0 0.75rem; }
+    h3 { font-size: 36px; font-weight: 700; margin: 0 0 0.5rem; color: #AC1A06; }
+    h4 { font-size: 24px; font-weight: 700; margin: 0 0 0.25rem; }
+    p  { font-size: 22px; line-height: 1.6; margin: 0 0 0.75rem; max-width: 900px; text-align: center; color: #c8d6e5; }
+    .small { font-size: 18px; color: #8899aa; }
+    .tag  {
+      display: inline-block;
+      background: rgba(172, 26, 6, 0.2);
+      border: 1px solid #AC1A06;
+      color: #ff6b5b;
+      padding: 4px 16px;
+      border-radius: 20px;
+      font-size: 16px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+    }
+
+    /* Search box */
+    .search-boxes {
+      display: flex;
+      gap: 2rem;
+      width: 1000px;
+    }
+    .search-box {
+      flex: 1;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      padding: 2rem;
+      text-align: center;
+    }
+    .search-box h4 { color: #fff; margin-bottom: 1rem; }
+    .fake-input {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 4px;
+      padding: 12px 16px;
+      margin: 0.5rem 0;
+      font-size: 18px;
+      color: #8899aa;
+      text-align: left;
+    }
+    .btn-red {
+      display: inline-block;
+      background: #AC1A06;
+      color: #fff;
+      padding: 12px 32px;
+      border-radius: 4px;
+      font-size: 18px;
+      font-weight: 700;
+      text-decoration: none;
+      margin-top: 0.5rem;
+    }
+
+    /* Cards grid */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      width: 1200px;
+    }
+    .card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      transition: border-color 0.3s;
+    }
+    .card:hover { border-color: #AC1A06; }
+    .card-icon {
+      width: 64px; height: 64px;
+      background: rgba(172,26,6,0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      font-size: 32px;
+    }
+
+    /* Footer / acknowledgment */
+    .ack-bar {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(0,0,0,0.5);
+      border-top: 3px solid #AC1A06;
+      padding: 1.5rem 3rem;
+      text-align: center;
+    }
+
+    /* Logo */
+    .site-logo {
+      font-size: 20px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #AC1A06;
+      font-weight: 700;
+    }
+
+    /* Grid layout for hero */
+    .hero-inner { text-align: center; padding: 0 3rem; }
+    .hero-stats { display: flex; gap: 3rem; margin-top: 1.5rem; }
+    .hero-stat { text-align: center; }
+    .hero-stat .num { font-size: 56px; font-weight: 900; color: #AC1A06; }
+    .hero-stat .lbl { font-size: 16px; color: #8899aa; text-transform: uppercase; }
+
+    /* Two-col */
+    .two-col { display: flex; gap: 3rem; width: 1100px; }
+    .two-col > div { flex: 1; padding: 2rem; background: rgba(255,255,255,0.04); border-radius: 8px; }
+    .two-col h3 { margin-bottom: 0.5rem; }
+    .two-col p { text-align: left; font-size: 18px; }
+  </style>
+</head>
+<body>
+  <div
+    id="root"
+    data-composition-id="main"
+    data-start="0"
+    data-width="1920"
+    data-height="1080"
+    data-duration="32"
+  >
+    <!-- Background layers (full composition) -->
+    <div class="hero-bg"></div>
+    <div class="hero-pattern"></div>
+    <div class="accent-bar"></div>
+
+    <!-- SCENE 1: Hero — Site Name + Tagline (0–3.5s) -->
+    <section id="scene-hero" class="clip" data-start="0" data-duration="3.5" data-track-index="1">
+      <div class="hero-inner">
+        <div class="tag" id="hero-tag">AUSTRALIAN GOVERNMENT</div>
+        <h1 id="hero-title">Sarah Whitfield Community<br/>Protection Public Website</h1>
+        <p id="hero-desc">Search sex offender registries for all Australian states and territories,<br/>including Aboriginal and Torres Strait Islander Communities.</p>
+        <div class="hero-stats" id="hero-stats">
+          <div class="hero-stat"><div class="num">5.4M+</div><div class="lbl">Total Searches</div></div>
+          <div class="hero-stat"><div class="num">50</div><div class="lbl">States &amp; Territories</div></div>
+          <div class="hero-stat"><div class="num">24/7</div><div class="lbl">Public Access</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCENE 2: Search Tools (3.5–8s) -->
+    <section id="scene-search" class="clip" data-start="3.5" data-duration="4.5" data-track-index="2">
+      <div class="hero-inner">
+        <div class="tag" id="search-tag">SEARCH REGISTRIES</div>
+        <h2 id="search-heading">Find Registered Offenders</h2>
+        <p style="margin-bottom:2rem" id="search-desc">Search by name or location across all Australian jurisdictions</p>
+        <div class="search-boxes">
+          <div class="search-box" id="search-name-box">
+            <h4>SEARCH BY NAME</h4>
+            <div class="fake-input">First Name (Required)</div>
+            <div class="fake-input">Last Name (Required)</div>
+            <div class="btn-red">Name Search</div>
+          </div>
+          <div class="search-box" id="search-loc-box">
+            <h4>SEARCH BY LOCATION</h4>
+            <div class="fake-input">Address</div>
+            <div class="fake-input">City / Town</div>
+            <div class="btn-red">Location Search</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCENE 3: About CPPW (8–13.5s) -->
+    <section id="scene-about" class="clip" data-start="8" data-duration="5.5" data-track-index="3">
+      <div class="hero-inner">
+        <div class="tag" id="about-tag">ABOUT CPPW</div>
+        <h2 id="about-heading">National Public Safety Resource</h2>
+        <p style="max-width:1000px;text-align:center" id="about-p1">
+          The Sarah Whitfield Community Protection Public Website is an unprecedented public safety
+          resource providing access to sex offender data nationwide — a partnership between the Australian
+          Government Attorney-General's Department and state, territorial and tribal governments.
+        </p>
+        <p style="max-width:1000px;text-align:center" id="about-p2">
+          First established in 2006 as the National Community Protection Registry, renamed by the
+          Australian Community Safeguarding and Protection Act in 2007 in honor of university student
+          Sarah Whitfield of Bendigo, New South Wales.
+        </p>
+      </div>
+    </section>
+
+    <!-- SCENE 4: Report Abuse (13.5–19.5s) -->
+    <section id="scene-report" class="clip" data-start="13.5" data-duration="6" data-track-index="4">
+      <div class="hero-inner">
+        <div class="tag" id="report-tag">GET HELP</div>
+        <h2 id="report-heading">How to Report Abuse and Get Help</h2>
+        <div class="two-col" style="margin-top:2rem">
+          <div id="report-col1">
+            <h3>Protect a Child</h3>
+            <p>If you know or suspect a child is being sexually abused, report it to your local child protective services. Contact the Australian Child Safety and Support Services for guidance.</p>
+            <div class="btn-red" style="margin-top:1rem">Child Safety Services</div>
+          </div>
+          <div id="report-col2">
+            <h3>Get Support</h3>
+            <p>If you have been sexually assaulted, help is available. Call your local police or contact the national sexual assault hotline at 1800 737 732 — free, confidential, anonymous.</p>
+            <div class="btn-red" style="margin-top:1rem">1800RESPECT</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCENE 5: Safety & Education (19.5–27.5s) -->
+    <section id="scene-safety" class="clip" data-start="19.5" data-duration="8" data-track-index="5">
+      <div class="hero-inner">
+        <div class="tag" id="safety-tag">SAFETY &amp; EDUCATION</div>
+        <h2 id="safety-heading">Learn, Identify, Respond</h2>
+        <p style="margin-bottom:2rem" id="safety-desc">Topics to help protect yourself and your community</p>
+        <div class="card-grid">
+          <div class="card" id="card1">
+            <div class="card-icon">🛡️</div>
+            <h4>How to Prevent</h4>
+            <p class="small">Age-appropriate conversations and safety planning</p>
+          </div>
+          <div class="card" id="card2">
+            <div class="card-icon">🔍</div>
+            <h4>How to Identify</h4>
+            <p class="small">Recognize warning signs and abusive behaviours</p>
+          </div>
+          <div class="card" id="card3">
+            <div class="card-icon">🤝</div>
+            <h4>How to Respond</h4>
+            <p class="small">Support victims and address concerning behaviours</p>
+          </div>
+          <div class="card" id="card4">
+            <div class="card-icon">📋</div>
+            <h4>Questions &amp; Answers</h4>
+            <p class="small">Facts about sexual assault and offending</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCENE 6: Acknowledgment of Country (27.5–32s) -->
+    <section id="scene-ack" class="clip" data-start="27.5" data-duration="4.5" data-track-index="6">
+      <div class="ack-bar" style="position:relative; height:100%; display:flex; align-items:center; justify-content:center; flex-direction:column; inset:0;">
+        <p style="font-size:32px;font-weight:700;color:#fff;margin-bottom:1rem" id="ack-title">Acknowledgment of Country</p>
+        <p style="max-width:900px;font-size:20px;color:#c8d6e5;text-align:center" id="ack-text">
+          The Sarah Whitfield Community Protection Public Website acknowledges the Traditional Owners
+          of Country throughout Australia and recognises their continuing connection to land, waters,
+          and community. We pay our respects to them and their cultures, and to Elders past, present,
+          and emerging.
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+
+    // ── Scene 1: Hero (0–3.5s) ──
+    tl.from("#hero-tag",    { y: 30, opacity: 0, duration: 0.5, ease: "power3.out" }, 0.1)
+      .from("#hero-title",  { y: 40, opacity: 0, duration: 0.6, ease: "power3.out" }, 0.3)
+      .from("#hero-desc",   { y: 20, opacity: 0, duration: 0.5, ease: "power3.out" }, 0.6)
+      .from("#hero-stats",  { y: 30, opacity: 0, duration: 0.6, ease: "power3.out" }, 0.9);
+
+    // ── Scene 2: Search (3.5–8s) ──
+    tl.from("#search-tag",      { y: 20, opacity: 0, duration: 0.4, ease: "power3.out" }, 3.6)
+      .from("#search-heading",  { y: 30, opacity: 0, duration: 0.5, ease: "power3.out" }, 3.7)
+      .from("#search-desc",     { y: 20, opacity: 0, duration: 0.4, ease: "power3.out" }, 3.9)
+      .from("#search-name-box", { x: -60, opacity: 0, duration: 0.5, ease: "power3.out" }, 4.1)
+      .from("#search-loc-box",  { x: 60, opacity: 0, duration: 0.5, ease: "power3.out" }, 4.3);
+
+    // ── Scene 3: About CPPW (8–13.5s) ──
+    tl.from("#about-tag",     { y: 20, opacity: 0, duration: 0.4, ease: "power3.out" }, 8.1)
+      .from("#about-heading", { y: 30, opacity: 0, duration: 0.5, ease: "power3.out" }, 8.2)
+      .from("#about-p1",      { y: 20, opacity: 0, duration: 0.5, ease: "power3.out" }, 8.5)
+      .from("#about-p2",      { y: 20, opacity: 0, duration: 0.5, ease: "power3.out" }, 8.8);
+
+    // ── Scene 4: Report Abuse (13.5–19.5s) ──
+    tl.from("#report-tag",     { y: 20, opacity: 0, duration: 0.4, ease: "power3.out" }, 13.6)
+      .from("#report-heading", { y: 30, opacity: 0, duration: 0.5, ease: "power3.out" }, 13.7)
+      .from("#report-col1",    { x: -60, opacity: 0, duration: 0.5, ease: "power3.out" }, 14.0)
+      .from("#report-col2",    { x: 60, opacity: 0, duration: 0.5, ease: "power3.out" }, 14.2);
+
+    // ── Scene 5: Safety & Education (19.5–27.5s) ──
+    tl.from("#safety-tag",     { y: 20, opacity: 0, duration: 0.4, ease: "power3.out" }, 19.6)
+      .from("#safety-heading", { y: 30, opacity: 0, duration: 0.5, ease: "power3.out" }, 19.7)
+      .from("#safety-desc",    { y: 20, opacity: 0, duration: 0.4, ease: "power3.out" }, 19.9)
+      .from("#card1",          { y: 40, opacity: 0, duration: 0.4, ease: "power3.out" }, 20.2)
+      .from("#card2",          { y: 40, opacity: 0, duration: 0.4, ease: "power3.out" }, 20.4)
+      .from("#card3",          { y: 40, opacity: 0, duration: 0.4, ease: "power3.out" }, 20.6)
+      .from("#card4",          { y: 40, opacity: 0, duration: 0.4, ease: "power3.out" }, 20.8);
+
+    // ── Scene 6: Acknowledgment (27.5–32s) ──
+    tl.from("#ack-title", { y: 20, opacity: 0, duration: 0.5, ease: "power3.out" }, 27.6)
+      .from("#ack-text",  { y: 20, opacity: 0, duration: 0.6, ease: "power3.out" }, 27.9);
+
+    window.__timelines["main"] = tl;
+  </script>
+</body>
+</html>

@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Search Public Sex Offender Registries | CPPW</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&amp;family=Playfair+Display:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&amp;display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --concrete: #d4cfc8;
+  --concrete-dim: #9e9890;
+  --stone: #706050;
+  --charcoal: #1a1816;
+  --ink: #0e0d0c;
+  --warm-white: #f4f0ea;
+  --warm-white-dim: #c8c0b4;
+  --accent-blue: #2563eb;
+  --accent-blue-glow: rgba(37,99,235,0.35);
+  --accent-blue-soft: rgba(37,99,235,0.08);
+  --sunset-pink: #d4a0b0;
+  --gold-warm: #c89848;
+  --heading: 'Playfair Display', 'Georgia', serif;
+  --body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);background:var(--ink);color:var(--warm-white);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+#cursor-dot{position:fixed;width:6px;height:6px;background:var(--warm-white);border-radius:50%;pointer-events:none;z-index:9998;mix-blend-mode:difference;transform:translate(-50%,-50%)}
+#cursor-ring{position:fixed;width:36px;height:36px;border:1px solid var(--concrete);border-radius:50%;pointer-events:none;z-index:9997;transform:translate(-50%,-50%)}
+#grain-overlay{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:100;opacity:.035}
+#grain-overlay svg{width:100%;height:100%}
+#vignette{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:99;background:radial-gradient(ellipse at center,transparent 50%,rgba(14,13,12,0.45) 100%)}
+#particles-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:15}
+.loader{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .6s,filter .6s}
+.loader.hidden{opacity:0;filter:blur(8px);pointer-events:none}
+.loader-brand{font-family:var(--heading);font-weight:300;font-size:clamp(18px,2.5vw,32px);letter-spacing:.35em;text-transform:uppercase;color:var(--warm-white);margin-bottom:4px}
+.loader-line{width:60px;height:1px;background:var(--concrete-dim);margin:12px 0}
+.loader-bar-wrapper{width:140px;height:2px;background:var(--charcoal);border-radius:2px;overflow:hidden;margin:8px 0}
+.loader-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent-blue),var(--sunset-pink));border-radius:2px;transition:width .3s}
+.loader-pct{font-family:var(--body);font-size:11px;font-weight:400;letter-spacing:.1em;color:var(--concrete-dim);margin-top:4px}
+.chapter-markers{position:fixed;right:24px;top:50%;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;align-items:center;gap:6px}
+.chapter-dot{width:6px;height:6px;border-radius:50%;background:var(--concrete-dim);cursor:pointer;transition:all .4s;position:relative}
+.chapter-dot.active{background:var(--accent-blue);box-shadow:0 0 8px var(--accent-blue-glow);width:8px;height:8px}
+.chapter-line{width:1px;height:16px;background:var(--concrete-dim);opacity:.3;transition:background .4s}
+.chapter-line.active{background:var(--accent-blue);opacity:.6}
+.chapter-label{position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:9px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--warm-white-dim);white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none}
+.chapter-dot:hover .chapter-label{opacity:1}
+.animation-section{position:relative;height:350vh;z-index:1}
+.animation-section .sticky{position:sticky;top:0;height:100vh;overflow:hidden}
+#main-canvas{display:block;width:100%;height:100%;object-fit:cover}
+.canvas-overlay-left{position:absolute;top:0;left:0;width:40%;height:100%;background:linear-gradient(90deg,rgba(14,13,12,0.7) 0%,transparent 100%);pointer-events:none;z-index:1}
+.canvas-overlay-bottom{position:absolute;bottom:0;left:0;width:100%;height:30%;background:linear-gradient(0deg,rgba(14,13,12,0.5) 0%,transparent 100%);pointer-events:none;z-index:1}
+.tint-overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;transition:background 1s}
+.scroll-text{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10;display:flex;align-items:center;padding:0 6%}
+.scroll-text .inner{max-width:600px;opacity:0;transform:translateX(-20px);filter:blur(6px);transition:all .8s cubic-bezier(.16,1,.3,1)}
+.scroll-text.visible .inner{opacity:1;transform:translateX(0);filter:blur(0)}
+.scroll-text.center{align-items:center;justify-content:center;text-align:center}
+.scroll-text.center .inner{max-width:700px}
+.text-overline{font-family:var(--body);font-size:8px;font-weight:500;letter-spacing:.3em;text-transform:uppercase;color:var(--accent-blue);margin-bottom:16px}
+.text-title{font-family:var(--heading);font-weight:300;font-size:clamp(32px,4.5vw,62px);color:var(--warm-white);line-height:1.15;margin-bottom:16px}
+.text-title i{font-style:italic;font-weight:300}
+.text-body{font-family:var(--body);font-weight:300;font-size:clamp(14px,1.1vw,18px);color:var(--warm-white-dim);line-height:1.7;margin-bottom:24px;max-width:520px}
+.search-card{background:rgba(244,240,234,0.03);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(244,240,234,0.06);border-radius:16px;padding:28px;margin-top:16px;max-width:480px}
+.search-card .search-input-wrapper{display:flex;gap:8px;background:rgba(14,13,12,0.5);border:1px solid rgba(244,240,234,0.08);border-radius:10px;padding:4px;margin-bottom:12px}
+.search-card .search-input-wrapper input{flex:1;background:transparent;border:none;padding:10px 16px;font-family:var(--body);font-size:13px;color:var(--warm-white);outline:none}
+.search-card .search-input-wrapper input::placeholder{color:var(--concrete-dim)}
+.search-card .search-input-wrapper button{padding:10px 20px;background:var(--accent-blue);color:var(--warm-white);border:none;border-radius:8px;font-family:var(--body);font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .3s}
+.search-card .search-input-wrapper button:hover{background:#1d4ed8}
+.search-card .search-options{display:flex;gap:8px;flex-wrap:wrap}
+.search-card .search-options button{padding:6px 14px;background:transparent;border:1px solid rgba(244,240,234,0.06);border-radius:6px;font-family:var(--body);font-size:9px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:var(--concrete-dim);cursor:pointer;transition:all .3s}
+.search-card .search-options button:hover{border-color:var(--accent-blue);color:var(--warm-white);background:var(--accent-blue-soft)}
+.search-card .search-options button.active{border-color:var(--accent-blue);color:var(--warm-white);background:var(--accent-blue-soft)}
+.search-card .search-info{font-family:var(--body);font-size:9px;font-weight:300;color:var(--concrete-dim);margin-top:12px;line-height:1.6}
+.search-card .search-info strong{color:var(--warm-white-dim)}
+.icon-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid rgba(244,240,234,0.04)}
+.icon-item:last-child{border-bottom:none}
+.icon-item .ico{width:28px;height:28px;border-radius:50%;background:var(--accent-blue-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;color:var(--accent-blue)}
+.icon-item .txt{font-family:var(--body);font-weight:300;font-size:13px;color:var(--warm-white-dim);line-height:1.5}
+.icon-item .txt strong{color:var(--warm-white);font-weight:500}
+.glass-bar{display:flex;gap:24px;padding:16px 24px;background:rgba(244,240,234,0.03);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(244,240,234,0.06);border-radius:12px;margin-top:24px;flex-wrap:wrap}
+.glass-stat{text-align:center;min-width:80px}
+.glass-stat .num{font-family:var(--heading);font-weight:300;font-size:clamp(18px,2vw,28px);color:var(--warm-white)}
+.glass-stat .lbl{font-size:8px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--concrete-dim);margin-top:2px}
+.grid-2col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.glass-card{padding:16px;background:rgba(244,240,234,0.03);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(244,240,234,0.06);border-radius:12px;transition:all .3s}
+.glass-card:hover{background:rgba(244,240,234,0.06);border-color:var(--accent-blue)}
+.glass-card .card-ico{font-size:20px;margin-bottom:8px}
+.glass-card .card-title{font-family:var(--body);font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--warm-white);margin-bottom:4px}
+.glass-card .card-desc{font-family:var(--body);font-weight:300;font-size:11px;color:var(--concrete-dim);line-height:1.5}
+.quote-mark{font-family:var(--heading);font-size:clamp(48px,6vw,80px);color:var(--accent-blue);line-height:.8;margin-bottom:-8px;font-weight:300}
+.quote-text{font-family:var(--heading);font-weight:300;font-style:italic;font-size:clamp(18px,2vw,28px);color:var(--warm-white);line-height:1.4;margin-bottom:16px}
+.quote-divider{width:40px;height:1px;background:var(--concrete-dim);margin:16px 0}
+.quote-attrib{font-family:var(--body);font-size:10px;font-weight:400;letter-spacing:.15em;text-transform:uppercase;color:var(--concrete-dim)}
+.gallery-section{position:relative;z-index:2;padding:80px 6%;background:var(--ink)}
+.gallery-title{font-family:var(--heading);font-weight:300;font-size:clamp(24px,3vw,42px);color:var(--warm-white);margin-bottom:40px;text-align:center}
+.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:1200px;margin:0 auto}
+.gallery-item{overflow:hidden;border-radius:8px}
+.gallery-item img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s}
+.gallery-item:hover img{transform:scale(1.03)}
+.gallery-item.tall{grid-row:span 2}
+.footer{padding:40px 6% 24px;text-align:center;background:var(--charcoal)}
+.footer-brand{font-family:var(--heading);font-weight:300;font-size:14px;letter-spacing:.25em;text-transform:uppercase;color:var(--warm-white-dim);margin-bottom:8px}
+.footer-legal{font-family:var(--body);font-size:10px;font-weight:300;color:var(--concrete-dim);line-height:1.8}
+.cta-buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px}
+.cta-primary{padding:12px 28px;background:var(--accent-blue);color:var(--warm-white);border:none;border-radius:8px;font-family:var(--body);font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .3s;text-decoration:none}
+.cta-primary:hover{background:#1d4ed8;box-shadow:0 0 20px var(--accent-blue-glow)}
+.cta-secondary{padding:12px 28px;background:transparent;color:var(--warm-white);border:1px solid rgba(244,240,234,0.15);border-radius:8px;font-family:var(--body);font-size:11px;font-weight:400;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .3s;text-decoration:none}
+.cta-secondary:hover{border-color:var(--warm-white);background:rgba(244,240,234,0.04)}
+@media(max-width:768px){
+  .scroll-text{padding:0 8%}
+  .scroll-text .inner{max-width:100%}
+  .grid-2col{grid-template-columns:1fr}
+  .gallery-grid{grid-template-columns:repeat(2,1fr)}
+  .chapter-markers{display:none}
+  #cursor-dot,#cursor-ring{display:none}
+  .glass-bar{flex-direction:column;align-items:center}
+}
+</style>
+</head>
+<body>
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+<div id="grain-overlay"><svg viewbox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feturbulence basefrequency=".7" numoctaves="4" stitchtiles="stitch" type="fractalNoise"></feturbulence><fecolormatrix type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 .035 0"></fecolormatrix></filter><rect filter="url(#noise)" height="100%" opacity="1" width="100%"></rect></svg></div>
+<div id="vignette"></div>
+<canvas id="particles-canvas"></canvas>
+<div class="loader" id="loader">
+<div class="loader-brand">CPPW</div>
+<div class="loader-line"></div>
+<div class="loader-bar-wrapper"><div class="loader-bar" id="loader-bar"></div></div>
+<div class="loader-pct" id="loader-pct">0%</div>
+</div>
+<div class="chapter-markers" id="chapter-markers"></div>
+<section class="animation-section" id="animation-section">
+<div class="sticky">
+<canvas id="main-canvas"></canvas>
+<div class="canvas-overlay-left"></div>
+<div class="canvas-overlay-bottom"></div>
+<div class="tint-overlay" id="tint-overlay"></div>
+<div class="scroll-text" data-hide-at="0.18" data-show-at="0.04">
+<div class="inner">
+<div class="text-overline">Australian Government · Attorney-General's Department</div>
+<div class="text-title">Search Public<br/>Sex Offender<br/><i>Registries</i></div>
+<div class="text-body">Search across all Australian state and territory sex offender registries from one secure, official platform.</div>
+<div class="search-card">
+<div class="search-input-wrapper">
+<input disabled="" placeholder="Search by name, suburb, or postcode..." type="text"/>
+<button disabled="">Search</button>
+</div>
+<div class="search-options">
+<button class="active">All Registries</button>
+<button>By Name</button>
+<button>By Location</button>
+<button>Advanced</button>
+</div>
+<div class="search-info">🔒 <strong>Secure search</strong> · Official government database · 5.4M+ searches completed</div>
+</div>
+</div>
+</div>
+<div class="scroll-text" data-hide-at="0.35" data-show-at="0.21">
+<div class="inner">
+<div class="quote-mark">"</div>
+<div class="quote-text">Public access to sex offender information empowers communities to take informed, proactive steps toward safety.</div>
+<div class="quote-divider"></div>
+<div class="quote-attrib">Attorney-General's Department — Community Safety</div>
+</div>
+</div>
+<div class="scroll-text" data-hide-at="0.52" data-show-at="0.37">
+<div class="inner">
+<div class="text-overline">How to Search</div>
+<div class="text-title">Simple. Secure.<br/>Comprehensive.</div>
+<div class="text-body">The CPPW search tool connects you to registries across Australia in three easy steps.</div>
+<div class="icon-item"><div class="ico">1</div><div class="txt"><strong>Choose your search</strong> — Search by name, location, or browse all registries</div></div>
+<div class="icon-item"><div class="ico">2</div><div class="txt"><strong>Review the results</strong> — Each result links directly to the official state or territory registry</div></div>
+<div class="icon-item"><div class="ico">3</div><div class="txt"><strong>Access resources</strong> — After your search, find safety education and support services</div></div>
+</div>
+</div>
+<div class="scroll-text" data-hide-at="0.68" data-show-at="0.53">
+<div class="inner">
+<div class="text-overline">Search Options</div>
+<div class="text-title">Search Your Way</div>
+<div class="grid-2col">
+<div class="glass-card"><div class="card-ico">👤</div><div class="card-title">By Name</div><div class="card-desc">Search using first name, last name, or both. Includes alias support.</div></div>
+<div class="glass-card"><div class="card-ico">📍</div><div class="card-title">By Location</div><div class="card-desc">Filter results by suburb, postcode, state, or territory.</div></div>
+<div class="glass-card"><div class="card-ico">📋</div><div class="card-title">All Registries</div><div class="card-desc">Browse all registered offenders across participating jurisdictions.</div></div>
+<div class="glass-card"><div class="card-ico">🔎</div><div class="card-title">Advanced Filters</div><div class="card-desc">Refine by offence type, registration status, and geographic area.</div></div>
+<div class="glass-card"><div class="card-ico">🔄</div><div class="card-title">Real-Time Data</div><div class="card-desc">Searches connect directly to live registry databases for current information.</div></div>
+<div class="glass-card"><div class="card-ico">📱</div><div class="card-title">Mobile Friendly</div><div class="card-desc">Full search functionality optimized for phones, tablets, and desktops.</div></div>
+</div>
+</div>
+</div>
+<div class="scroll-text" data-hide-at="0.85" data-show-at="0.69">
+<div class="inner">
+<div class="text-overline">What Happens Next</div>
+<div class="text-title">After Your<br/><i>Search</i></div>
+<div class="text-body">When you click through to a state or territory registry, you leave CPPW and enter the official government registry for that jurisdiction.</div>
+<div class="icon-item"><div class="ico">🔗</div><div class="txt"><strong>Direct to source</strong> — Results link directly to official government registries</div></div>
+<div class="icon-item"><div class="ico">📘</div><div class="txt"><strong>Safety resources</strong> — Guidance on how to interpret and act on what you find</div></div>
+<div class="icon-item"><div class="ico">🆘</div><div class="txt"><strong>Support services</strong> — Contact information for victim support and community programs</div></div>
+<div class="icon-item"><div class="ico">❓</div><div class="txt"><strong>FAQs</strong> — Answers to common questions about the registry and your search</div></div>
+</div>
+</div>
+<div class="scroll-text center" data-hide-at="1.0" data-show-at="0.87">
+<div class="inner">
+<div class="text-overline">Official Government Service</div>
+<div class="text-title">Your Safety<br/>Is Our <i>Priority</i>.</div>
+<div class="text-body" style="margin:0 auto">The CPPW is Australia's official national portal for public sex offender registry searches. Secure, private, and always available.</div>
+<div class="cta-buttons">
+<a class="cta-secondary" href="../index.html">← Back to Home</a>
+<a class="cta-primary" href="../safety-and-education.html">Safety Resources</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="gallery-section">
+<div class="gallery-title">Registry Search Gallery</div>
+<div class="gallery-grid" id="gallery-grid"></div>
+</section>
+<footer class="footer">
+<div class="footer-brand">Sarah Whitfield Community Protection Public Website</div>
+<div class="footer-legal">An official website of the Australian Government, Attorney-General's Department.<br/>CPPW · Community Protection Public Website</div>
+</footer>
+<script>
+const FRAME_COUNT = 100;
+const FRAME_DIR = 'frames/desktop/';
+const MOBILE_FRAME_DIR = 'frames/mobile/';
+const SCROLL_HEIGHT_VH = 350;
+const LERP_FACTOR = 0.09;
+const DWELL_WIDTH = 0.045;
+const DWELL_PEAK = 3.5;
+const REMAP_N = 2000;
+const IS_MOBILE = window.innerWidth < 768;
+
+const section = document.getElementById('animation-section');
+const canvas = document.getElementById('main-canvas');
+const ctx2d = canvas.getContext('2d');
+const particlesCanvas = document.getElementById('particles-canvas');
+const pctx = particlesCanvas.getContext('2d');
+const tintOverlay = document.getElementById('tint-overlay');
+const chapterMarkers = document.getElementById('chapter-markers');
+const galleryGrid = document.getElementById('gallery-grid');
+
+const ACTIVE_DIR = IS_MOBILE ? MOBILE_FRAME_DIR : FRAME_DIR;
+let frames = [];
+let currentFrame = 0;
+let targetFrame = 0;
+let animationId = null;
+let loadedCount = 0;
+let firstFrameShown = false;
+
+function buildRemap(dwellCenters) {
+  const density = new Float64Array(REMAP_N);
+  const integral = new Float64Array(REMAP_N);
+  for (let i = 0; i < REMAP_N; i++) {
+    const x = i / (REMAP_N - 1);
+    let d = 1;
+    for (const c of dwellCenters) {
+      d += (DWELL_PEAK - 1) * Math.exp(-0.5 * Math.pow((x - c) / DWELL_WIDTH, 2));
+    }
+    density[i] = d;
+  }
+  let total = 0;
+  for (let i = 0; i < REMAP_N; i++) { total += density[i]; integral[i] = total; }
+  const norm = total / (REMAP_N - 1);
+  for (let i = 0; i < REMAP_N; i++) integral[i] /= norm;
+  return integral;
+}
+
+const dwellCenters = [0.065, 0.21, 0.365, 0.525, 0.685, 0.89];
+const remapLUT = buildRemap(dwellCenters);
+
+function remapProgress(raw) {
+  const idx = Math.round(raw * (REMAP_N - 1));
+  return remapLUT[Math.max(0, Math.min(REMAP_N - 1, idx))] / remapLUT[REMAP_N - 1];
+}
+
+function getScrollProgress() {
+  const rect = section.getBoundingClientRect();
+  return Math.max(0, Math.min(1, -rect.top / (rect.height - window.innerHeight)));
+}
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  particlesCanvas.width = window.innerWidth;
+  particlesCanvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function loadFrames() {
+  const criticalIndices = [];
+  for (let i = 0; i < 5; i++) criticalIndices.push(Math.floor((i / 4) * (FRAME_COUNT - 1)));
+  let loaded = 0;
+  function loadOne(idx) {
+    const img = new Image();
+    img.onload = () => {
+      frames[idx] = img;
+      loaded++;
+      updateLoader(loaded / FRAME_COUNT);
+      if (!firstFrameShown && frames[0]) { firstFrameShown = true; drawFrame(0); }
+      if (loaded === FRAME_COUNT) { setTimeout(hideLoader, 300); startAnimation(); }
+    };
+    img.onerror = () => { frames[idx] = null; loaded++; updateLoader(loaded / FRAME_COUNT); };
+    img.src = ACTIVE_DIR + 'frame-' + String(idx + 1).padStart(4, '0') + '.webp';
+  }
+  for (const ci of criticalIndices) loadOne(ci);
+  let batchIdx = 0;
+  function loadBatch() {
+    while (batchIdx < FRAME_COUNT && frames[batchIdx]) batchIdx++;
+    if (batchIdx >= FRAME_COUNT) return;
+    const batchEnd = Math.min(batchIdx + 5, FRAME_COUNT);
+    for (let i = batchIdx; i < batchEnd; i++) { if (!frames[i]) loadOne(i); }
+    batchIdx = batchEnd;
+    if (batchIdx < FRAME_COUNT) setTimeout(loadBatch, 50);
+  }
+  setTimeout(loadBatch, 200);
+}
+
+function updateLoader(progress) {
+  const pct = Math.min(100, Math.round(progress * 100));
+  document.getElementById('loader-bar').style.width = pct + '%';
+  document.getElementById('loader-pct').textContent = pct + '%';
+}
+
+function hideLoader() { document.getElementById('loader').classList.add('hidden'); }
+
+function drawFrame(frameIdx) {
+  const idx = Math.min(Math.max(0, Math.round(frameIdx)), FRAME_COUNT - 1);
+  const img = frames[idx];
+  if (!img) return;
+  const w = canvas.width, h = canvas.height;
+  const scale = Math.max(w / img.width, h / img.height);
+  const sw = img.width * scale, sh = img.height * scale;
+  ctx2d.clearRect(0, 0, w, h);
+  ctx2d.drawImage(img, (w - sw) / 2, (h - sh) / 2, sw, sh);
+}
+
+function startAnimation() {
+  if (animationId) return;
+  function animate() {
+    const raw = getScrollProgress();
+    const remapped = remapProgress(raw);
+    targetFrame = remapped * (FRAME_COUNT - 1);
+    currentFrame += (targetFrame - currentFrame) * LERP_FACTOR;
+    drawFrame(currentFrame);
+    updateScrollText(raw);
+    updateChapterMarkers(raw);
+    updateTint(raw);
+    animationId = requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+const scrollTexts = document.querySelectorAll('.scroll-text');
+function updateScrollText(progress) {
+  scrollTexts.forEach(el => {
+    const showAt = parseFloat(el.dataset.showAt);
+    const hideAt = parseFloat(el.dataset.hideAt);
+    el.classList.toggle('visible', progress >= showAt && progress < hideAt);
+  });
+}
+
+const labels = ['Search', 'Mission', 'How To', 'Options', 'Next Steps', 'CTA'];
+function buildChapters() {
+  let html = '';
+  for (let i = 0; i < 6; i++) {
+    if (i > 0) html += '<div class="chapter-line" data-idx="' + i + '"></div>';
+    html += '<div class="chapter-dot" data-idx="' + i + '"><span class="chapter-label">' + labels[i] + '</span></div>';
+  }
+  chapterMarkers.innerHTML = html;
+}
+buildChapters();
+
+function updateChapterMarkers(progress) {
+  const dots = document.querySelectorAll('.chapter-dot');
+  const lines = document.querySelectorAll('.chapter-line');
+  const activeIdx = Math.min(5, Math.floor(progress * 6));
+  dots.forEach((d, i) => d.classList.toggle('active', i === activeIdx));
+  lines.forEach((l, i) => l.classList.toggle('active', i <= activeIdx));
+}
+
+const tints = ['rgba(37,99,235,0.04)','rgba(37,99,235,0.03)','rgba(200,152,72,0.03)','rgba(212,160,176,0.03)','rgba(37,99,235,0.04)','rgba(200,152,72,0.04)'];
+function updateTint(progress) { tintOverlay.style.background = tints[Math.min(5, Math.floor(progress * 6))]; }
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * particlesCanvas.width;
+    this.y = Math.random() * particlesCanvas.height;
+    this.vx = (Math.random() - 0.5) * 0.3;
+    this.vy = (Math.random() - 0.5) * 0.3;
+    this.r = Math.random() * 1.5 + 0.3;
+    this.o = Math.random() * 0.25 + 0.03;
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy;
+    if (this.x < 0) this.x += particlesCanvas.width;
+    if (this.x > particlesCanvas.width) this.x -= particlesCanvas.width;
+    if (this.y < 0) this.y += particlesCanvas.height;
+    if (this.y > particlesCanvas.height) this.y -= particlesCanvas.height;
+  }
+  draw() {
+    pctx.beginPath();
+    pctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    pctx.fillStyle = 'rgba(244,240,234,' + this.o + ')';
+    pctx.fill();
+  }
+}
+for (let i = 0; i < 40; i++) { const p = new Particle(); particles.push(p); }
+function animateParticles() {
+  pctx.clearRect(0, 0, particlesCanvas.width, particlesCanvas.height);
+  for (const p of particles) { p.update(); p.draw(); }
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+function buildGallery() {
+  const indices = [0, 14, 28, 42, 57, 71, 85];
+  indices.forEach((fi, i) => {
+    const div = document.createElement('div');
+    div.className = 'gallery-item' + (i === 1 || i === 4 ? ' tall' : '');
+    const img = document.createElement('img');
+    img.loading = 'lazy';
+    img.src = ACTIVE_DIR + 'frame-' + String(fi + 1).padStart(4, '0') + '.webp';
+    img.alt = '';
+    div.appendChild(img);
+    galleryGrid.appendChild(div);
+  });
+}
+buildGallery();
+
+let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+document.addEventListener('mousemove', e => {
+  mouseX = e.clientX; mouseY = e.clientY;
+  document.getElementById('cursor-dot').style.left = mouseX + 'px';
+  document.getElementById('cursor-dot').style.top = mouseY + 'px';
+});
+(function animateCursor() {
+  ringX += (mouseX - ringX) * 0.15; ringY += (mouseY - ringY) * 0.15;
+  document.getElementById('cursor-ring').style.left = ringX + 'px';
+  document.getElementById('cursor-ring').style.top = ringY + 'px';
+  requestAnimationFrame(animateCursor);
+})();
+
+loadFrames();
+</script>
+</body>
+</html>
